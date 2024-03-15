@@ -12,6 +12,8 @@ namespace BUDZETdomowy.Models
         public Category Category { get; set; }
 
         [Required(ErrorMessage = "Please enter the amount")]
+        [Column(TypeName = "decimal(18, 2)")]
+        [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal Amount { get; set; }
 
         [Column(TypeName = "nvarchar(75)")]

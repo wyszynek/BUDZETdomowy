@@ -8,16 +8,15 @@ namespace BUDZETdomowy.Models
         [Key]
         public int TransactionId { get; set; }
 
-        [Required(ErrorMessage = "Please enter the title")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Title should be between 2 and 20 characters")]
-        [Column(TypeName = "nvarchar(50)")]
-        public string Title { get; set; }
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
 
-        [Required(ErrorMessage = "Please enter the type")]
-        [Column(TypeName = "nvarchar(50)")]
-        //(0 - wydatek, 1 - wplata, 2 - przelew)
-        public string Type { get; set; }
+        [Required(ErrorMessage = "Please enter the amount")]
+        public decimal Amount { get; set; }
+
+        [Column(TypeName = "nvarchar(75)")]
+        public string? Note { get; set; }
         
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
     }
 }

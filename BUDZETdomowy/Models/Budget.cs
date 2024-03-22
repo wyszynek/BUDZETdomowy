@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BUDZETdomowy.Models
 {
@@ -23,14 +24,10 @@ namespace BUDZETdomowy.Models
         [Required]
         public int CategoryId { get; set; }
 
-        [Required(ErrorMessage = "Please enter the amount")]
-        public decimal Amount { get; set; }
-
-        [Required]
-        public bool IsShared { get; set; }
-
-        [Required]
-        public bool IsFinished { get; set; }
+        [Required(ErrorMessage = "Please enter the limit")]
+        [Column(TypeName = "decimal(18, 2)")]
+        [DisplayFormat(DataFormatString = "{0:C2}")]
+        public decimal Limit { get; set; }
 
         public DateTime CreationTime { get; set; } = DateTime.Now;
 

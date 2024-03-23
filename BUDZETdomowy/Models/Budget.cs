@@ -19,10 +19,15 @@ namespace BUDZETdomowy.Models
 
         [Required(ErrorMessage = "Please enter the budget name")]
         [StringLength(25, MinimumLength = 2, ErrorMessage = "Name should be between 2 and 25 characters")]
-        public string BudgetName { get; set;}
+        public string BudgetName { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a category.")]
         public int CategoryId { get; set; }
+        public Category? Category { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Please select an account.")]
+        public int AccountId { get; set; }
+        public Account? Account { get; set; }
 
         [Required(ErrorMessage = "Please enter the limit")]
         [Column(TypeName = "decimal(18, 2)")]

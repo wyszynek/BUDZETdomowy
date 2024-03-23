@@ -22,7 +22,8 @@ namespace BUDZETdomowy.Controllers
         // GET: Budget
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Budgets.ToListAsync());
+            var applicationDbContext = _context.Budgets.Include(b => b.Account).Include(b => b.Category);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Budget/Details/5
@@ -34,6 +35,8 @@ namespace BUDZETdomowy.Controllers
             }
 
             var budget = await _context.Budgets
+                .Include(b => b.Account)
+                .Include(b => b.Category)
                 .FirstOrDefaultAsync(m => m.BudgetId == id);
             if (budget == null)
             {
@@ -46,6 +49,8 @@ namespace BUDZETdomowy.Controllers
         // GET: Budget/Create
         public IActionResult Create()
         {
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName");
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View();
         }
 
@@ -54,7 +59,7 @@ namespace BUDZETdomowy.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BudgetId,BudgetName,CategoryId,Limit,CreationTime,EndTime")] Budget budget)
+        public async Task<IActionResult> Create([Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,CreationTime,EndTime")] Budget budget)
         {
             if (ModelState.IsValid)
             {
@@ -62,6 +67,8 @@ namespace BUDZETdomowy.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
             return View(budget);
         }
 
@@ -78,6 +85,8 @@ namespace BUDZETdomowy.Controllers
             {
                 return NotFound();
             }
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
             return View(budget);
         }
 
@@ -86,7 +95,7 @@ namespace BUDZETdomowy.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BudgetId,BudgetName,CategoryId,Limit,CreationTime,EndTime")] Budget budget)
+        public async Task<IActionResult> Edit(int id, [Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,CreationTime,EndTime")] Budget budget)
         {
             if (id != budget.BudgetId)
             {
@@ -113,6 +122,8 @@ namespace BUDZETdomowy.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
             return View(budget);
         }
 
@@ -125,6 +136,8 @@ namespace BUDZETdomowy.Controllers
             }
 
             var budget = await _context.Budgets
+                .Include(b => b.Account)
+                .Include(b => b.Category)
                 .FirstOrDefaultAsync(m => m.BudgetId == id);
             if (budget == null)
             {
@@ -152,6 +165,24 @@ namespace BUDZETdomowy.Controllers
         private bool BudgetExists(int id)
         {
             return _context.Budgets.Any(e => e.BudgetId == id);
+        }
+
+        [NonAction]
+        public void PopulateCategories()
+        {
+            var CategoryCollection = _context.Categories.ToList();
+            Category DefaultCategory = new Category() { CategoryId = 0, CategoryName = "Choose a Category" };
+            CategoryCollection.Insert(0, DefaultCategory);
+            ViewBag.Categories = CategoryCollection;
+        }
+
+        [NonAction]
+        public void PopulateAccounts()
+        {
+            var AccountsCollection = _context.Accounts.ToList();
+            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose an Account" };
+            AccountsCollection.Insert(0, DefaultAccount);
+            ViewBag.Accounts = AccountsCollection;
         }
     }
 }

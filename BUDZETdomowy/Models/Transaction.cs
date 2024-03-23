@@ -9,7 +9,7 @@ namespace BUDZETdomowy.Models
         public int TransactionId { get; set; }
 
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
 
         [Required(ErrorMessage = "Please enter the amount")]
         [Column(TypeName = "decimal(18, 2)")]

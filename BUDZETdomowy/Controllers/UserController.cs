@@ -58,7 +58,8 @@ namespace BUDZETdomowy.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
+                user.HashPasswordSHA256();
+                _context.Add(user); 
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

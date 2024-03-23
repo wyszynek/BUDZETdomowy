@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BUDZETdomowy.Models
 {
@@ -26,6 +28,22 @@ namespace BUDZETdomowy.Models
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
 
-        public IEnumerable<Account> Accounts { get; set; }
+        public void HashPasswordSHA256()
+        {
+            StringBuilder Sb = new StringBuilder();
+
+            using (SHA256 hash = SHA256Managed.Create())
+            {
+                Encoding enc = Encoding.UTF8;
+                byte[] result = hash.ComputeHash(enc.GetBytes(Password));
+
+                foreach (byte b in result)
+                    Sb.Append(b.ToString("x2"));
+            }
+
+            Password = Sb.ToString();
+        }
+
+        public IEnumerable<Account> Accounts { get; set; } = new List<Account>();
     }
 }

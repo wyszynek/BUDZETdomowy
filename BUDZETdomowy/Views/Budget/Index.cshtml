@@ -16,7 +16,10 @@
                 @Html.DisplayNameFor(model => model.BudgetName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryId)
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Limit)
@@ -37,7 +40,10 @@
                 @Html.DisplayFor(modelItem => item.BudgetName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CategoryId)
+                @Html.DisplayFor(modelItem => item.Category.CategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Account.AccountName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Limit)

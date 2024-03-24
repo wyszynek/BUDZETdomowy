@@ -48,6 +48,7 @@ namespace BUDZETdomowy.Controllers
         // GET: Transaction/Create
         public IActionResult Create()
         {
+            PopulateCategories();
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View();
         }

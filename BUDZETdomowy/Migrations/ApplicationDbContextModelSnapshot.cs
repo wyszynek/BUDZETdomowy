@@ -51,7 +51,7 @@ namespace BUDZETdomowy.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("BUDZETdomowy.Models.Budget", b =>
@@ -88,7 +88,7 @@ namespace BUDZETdomowy.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Budgets");
+                    b.ToTable("Budgets", (string)null);
                 });
 
             modelBuilder.Entity("BUDZETdomowy.Models.Category", b =>
@@ -114,7 +114,7 @@ namespace BUDZETdomowy.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("BUDZETdomowy.Models.Notepad", b =>
@@ -137,7 +137,7 @@ namespace BUDZETdomowy.Migrations
 
                     b.HasKey("NoteID");
 
-                    b.ToTable("Notepad");
+                    b.ToTable("Notepad", (string)null);
                 });
 
             modelBuilder.Entity("BUDZETdomowy.Models.Transaction", b =>
@@ -164,7 +164,7 @@ namespace BUDZETdomowy.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("BUDZETdomowy.Models.User", b =>
@@ -200,7 +200,7 @@ namespace BUDZETdomowy.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("BUDZETdomowy.Models.Account", b =>

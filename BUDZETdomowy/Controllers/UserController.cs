@@ -96,6 +96,7 @@ namespace BUDZETdomowy.Controllers
 
             if (ModelState.IsValid)
             {
+                user.HashPasswordSHA256();
                 try
                 {
                     _context.Update(user);

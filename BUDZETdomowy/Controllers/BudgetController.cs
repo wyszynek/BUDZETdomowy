@@ -49,11 +49,10 @@ namespace BUDZETdomowy.Controllers
         // GET: Budget/Create
         public IActionResult Create()
         {
-            PopulateCategories();
-            PopulateAccounts();
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName");
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
-            return View();
+            PopulateCategoriesAndAccounts();
+            //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName");
+            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
+            return View(new Budget());
         }
 
         // POST: Budget/Create
@@ -69,8 +68,9 @@ namespace BUDZETdomowy.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
+            PopulateCategoriesAndAccounts();
+            //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
+            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
             return View(budget);
         }
 
@@ -170,17 +170,13 @@ namespace BUDZETdomowy.Controllers
         }
 
         [NonAction]
-        public void PopulateCategories()
+        public void PopulateCategoriesAndAccounts()
         {
             var CategoryCollection = _context.Categories.ToList();
             Category DefaultCategory = new Category() { CategoryId = 0, CategoryName = "Choose a Category" };
             CategoryCollection.Insert(0, DefaultCategory);
             ViewBag.Categories = CategoryCollection;
-        }
 
-        [NonAction]
-        public void PopulateAccounts()
-        {
             var AccountsCollection = _context.Accounts.ToList();
             Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose an Account" };
             AccountsCollection.Insert(0, DefaultAccount);

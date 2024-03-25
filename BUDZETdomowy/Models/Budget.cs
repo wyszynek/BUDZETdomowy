@@ -39,6 +39,6 @@ namespace BUDZETdomowy.Models
         [Required]
         [DataType(DataType.DateTime)]
         [CheckDate(ErrorMessage = "You cannot enter the date in the past!")]
-        public DateTime EndTime { get; set; }
+        public DateTime EndTime { get; set; } = DateTime.Now;
     }
 }

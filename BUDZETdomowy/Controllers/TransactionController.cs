@@ -49,8 +49,8 @@ namespace BUDZETdomowy.Controllers
         public IActionResult Create()
         {
             PopulateCategories();
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
-            return View();
+            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
+            return View(new Transaction());
         }
 
         // POST: Transaction/Create
@@ -66,7 +66,8 @@ namespace BUDZETdomowy.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
+            PopulateCategories();
+            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
             return View(transaction);
         }
 

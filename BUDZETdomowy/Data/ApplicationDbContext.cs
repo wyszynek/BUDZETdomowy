@@ -7,6 +7,21 @@ namespace BUDZETdomowy.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         protected ApplicationDbContext() { }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<TransactionBetweenAccounts>()
+                .HasOne(t => t.SenderAccount)
+                .WithMany()
+                .HasForeignKey(t => t.SenderId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<TransactionBetweenAccounts>()
+                .HasOne(t => t.RecipientAccount)
+                .WithMany()
+                .HasForeignKey(t => t.RecipientId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        }
 
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -14,5 +29,6 @@ namespace BUDZETdomowy.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<Notepad> Notepad { get; set; }
+        public DbSet<TransactionBetweenAccounts> TransactionBetweenAccounts { get; set; }
     }
 }

@@ -12,6 +12,10 @@ namespace BUDZETdomowy.Models
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Please select an account.")]
+        public int AccountId { get; set; }
+        public Account? Account { get; set; }
+
         [Range(1, int.MaxValue, ErrorMessage = "Amount should be greater than 0.")]
         [Column(TypeName = "decimal(18, 2)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]

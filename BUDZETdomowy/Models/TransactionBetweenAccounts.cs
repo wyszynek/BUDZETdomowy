@@ -8,13 +8,13 @@ namespace BUDZETdomowy.Models
         [Key]
         public int TransactionId { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Please select an account.")]
-        public int Account1Id { get; set; }
-        public Account? Account1 { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a sender account.")]
+        public int? SenderId { get; set; }
+        public Account? SenderAccount { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Please select an account.")]
-        public int Account2Id { get; set; }
-        public Account? Account2 { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a recipient account.")]
+        public int? RecipientId { get; set; }
+        public Account? RecipientAccount { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Amount should be greater than 0.")]
         [Column(TypeName = "decimal(18, 2)")]

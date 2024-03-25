@@ -22,7 +22,7 @@ namespace BUDZETdomowy.Controllers
         // GET: Transaction
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Transactions.Include(t => t.Category);
+            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Category);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,6 +35,7 @@ namespace BUDZETdomowy.Controllers
             }
 
             var transaction = await _context.Transactions
+                .Include(t => t.Account)
                 .Include(t => t.Category)
                 .FirstOrDefaultAsync(m => m.TransactionId == id);
             if (transaction == null)
@@ -48,7 +49,8 @@ namespace BUDZETdomowy.Controllers
         // GET: Transaction/Create
         public IActionResult Create()
         {
-            PopulateCategories();
+            PopulateCategoriesAndAccounts();
+            //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName");
             //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View(new Transaction());
         }
@@ -58,7 +60,7 @@ namespace BUDZETdomowy.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TransactionId,CategoryId,Amount,Note,Date")] Transaction transaction)
+        public async Task<IActionResult> Create([Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
         {
             if (ModelState.IsValid)
             {
@@ -66,7 +68,8 @@ namespace BUDZETdomowy.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            PopulateCategories();
+            PopulateCategoriesAndAccounts();
+            //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transaction.AccountId);
             //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
             return View(transaction);
         }
@@ -84,6 +87,7 @@ namespace BUDZETdomowy.Controllers
             {
                 return NotFound();
             }
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transaction.AccountId);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
             return View(transaction);
         }
@@ -93,7 +97,7 @@ namespace BUDZETdomowy.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TransactionId,CategoryId,Amount,Note,Date")] Transaction transaction)
+        public async Task<IActionResult> Edit(int id, [Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
         {
             if (id != transaction.TransactionId)
             {
@@ -120,6 +124,7 @@ namespace BUDZETdomowy.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transaction.AccountId);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
             return View(transaction);
         }
@@ -133,6 +138,7 @@ namespace BUDZETdomowy.Controllers
             }
 
             var transaction = await _context.Transactions
+                .Include(t => t.Account)
                 .Include(t => t.Category)
                 .FirstOrDefaultAsync(m => m.TransactionId == id);
             if (transaction == null)
@@ -163,13 +169,17 @@ namespace BUDZETdomowy.Controllers
             return _context.Transactions.Any(e => e.TransactionId == id);
         }
 
-        [NonAction]
-        public void PopulateCategories()
+        public void PopulateCategoriesAndAccounts()
         {
             var CategoryCollection = _context.Categories.ToList();
             Category DefaultCategory = new Category() { CategoryId = 0, CategoryName = "Choose a Category" };
             CategoryCollection.Insert(0, DefaultCategory);
             ViewBag.Categories = CategoryCollection;
+
+            var AccountsCollection = _context.Accounts.ToList();
+            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose an Account" };
+            AccountsCollection.Insert(0, DefaultAccount);
+            ViewBag.Accounts = AccountsCollection;
         }
     }
 }

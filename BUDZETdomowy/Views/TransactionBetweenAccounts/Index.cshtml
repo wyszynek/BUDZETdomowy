@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BUDZETdomowy.Models.Transaction>
+﻿@model IEnumerable<BUDZETdomowy.Models.TransactionBetweenAccounts>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,10 +13,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @Html.DisplayNameFor(model => model.SenderAccount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Account)
+                @Html.DisplayNameFor(model => model.RecipientAccount)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Amount)
@@ -34,10 +34,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                @Html.DisplayFor(modelItem => item.SenderAccount.AccountName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Account.AccountName)
+                @Html.DisplayFor(modelItem => item.RecipientAccount.AccountName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Amount)

@@ -12,10 +12,10 @@ namespace BUDZETdomowy.Models
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Category should be between 2 and 20 characters")]
         public string CategoryName { get; set; }
 
-        [Column(TypeName = "nvarchar(5)")]
+        [Column(TypeName = "nvarchar(100)")]
         public string Icon { get; set; } = "";
 
         [Column(TypeName = "nvarchar(50)")]
-        public string Type { get; set; } = "Expense"; //wydatek czy dochod, podstawowe dajemy jako wydatek
+        public string Type { get; set; } = "Expense";
     }
 }

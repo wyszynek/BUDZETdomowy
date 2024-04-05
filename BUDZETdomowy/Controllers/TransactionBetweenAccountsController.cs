@@ -49,8 +49,7 @@ namespace BUDZETdomowy.Controllers
         // GET: TransactionBetweenAccounts/Create
         public IActionResult Create()
         {
-            PopulateSenderAccount();
-            PopulateRecipientAccount();
+            PopulateAccount();
             //ViewData["RecipientId"] = new SelectList(_context.Accounts, "AccountId", "AccountName");
             //ViewData["SenderId"] = new SelectList(_context.Accounts, "AccountId", "AccountName");
             return View(new TransactionBetweenAccounts());
@@ -69,8 +68,7 @@ namespace BUDZETdomowy.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            PopulateSenderAccount();
-            PopulateRecipientAccount();
+            PopulateAccount();
             //ViewData["RecipientId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.RecipientId);
             //ViewData["SenderId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.SenderId);
             return View(transactionBetweenAccounts);
@@ -171,18 +169,10 @@ namespace BUDZETdomowy.Controllers
             return _context.TransactionBetweenAccounts.Any(e => e.TransactionId == id);
         }
 
-        public void PopulateSenderAccount()
+        public void PopulateAccount()
         {
             var AccountsCollection = _context.Accounts.ToList();
-            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose a sender account" };
-            AccountsCollection.Insert(0, DefaultAccount);
-            ViewBag.Accounts = AccountsCollection;
-        }
-
-        public void PopulateRecipientAccount()
-        {
-            var AccountsCollection = _context.Accounts.ToList();
-            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose a recipient account" };
+            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose an account" };
             AccountsCollection.Insert(0, DefaultAccount);
             ViewBag.Accounts = AccountsCollection;
         }

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BUDZETdomowy.Data;
 using BUDZETdomowy.Models;
+using System.Text;
+using ClosedXML.Excel;
 
 namespace BUDZETdomowy.Controllers
 {
@@ -24,6 +26,49 @@ namespace BUDZETdomowy.Controllers
         {
             var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Category);
             return View(await applicationDbContext.ToListAsync());
+        }
+
+        public IActionResult ExportToCSV()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("Category, Account, Amount, Date");
+            foreach (var transaction in _context.Transactions.Include(t => t.Category).Include(t => t.Account))
+            {
+                string categoryName = transaction.Category?.CategoryName ?? "Unknown";
+                string accountName = transaction.Account?.AccountName ?? "Unknown";
+                builder.AppendLine($"{categoryName}, {accountName}, {transaction.Amount}, {transaction.Date}");
+            }
+
+            return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "transactions.csv");
+        }
+
+        public IActionResult ExportToExcel()
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Transactions");
+                var currentRow = 1;
+                worksheet.Cell(currentRow, 1).Value = "Category";
+                worksheet.Cell(currentRow, 2).Value = "Account";
+                worksheet.Cell(currentRow, 3).Value = "Amount";
+                worksheet.Cell(currentRow, 4).Value = "Date";
+                foreach (var transaction in _context.Transactions.Include(t => t.Category).Include(t => t.Account))
+                {
+                    currentRow++;
+                    string categoryName = transaction.Category?.CategoryName ?? "Unknown";
+                    string accountName = transaction.Account?.AccountName ?? "Unknown";
+                    worksheet.Cell(currentRow, 1).Value = categoryName;
+                    worksheet.Cell(currentRow, 2).Value = accountName;
+                    worksheet.Cell(currentRow, 3).Value = transaction.Amount;
+                    worksheet.Cell(currentRow, 4).Value = transaction.Date;
+                }
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
+                }
+            }
         }
 
         // GET: Transaction/Details/5

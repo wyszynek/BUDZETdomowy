@@ -6,6 +6,18 @@
 
 <h1>Index</h1>
 
+<div class="text-center">
+    <form method="post" asp-controller="Transaction" asp-action="ExportToCSV">
+        <input type="submit" value="Export data to CSV"></input>
+    </form>
+</div>
+
+<div class="text-center">
+    <form method="post" asp-controller="Transaction" asp-action="ExportToExcel">
+        <input type="submit" value="Export data to Excel"></input>
+    </form>
+</div>
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>

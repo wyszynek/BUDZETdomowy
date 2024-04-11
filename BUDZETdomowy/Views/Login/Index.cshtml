@@ -1,0 +1,39 @@
+﻿@model BUDZETdomowy.Models.Login
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<h2>Login</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+
+    <div>
+        @Html.LabelFor(model => model.UserName)
+        @Html.TextBoxFor(model => model.UserName)
+        @Html.ValidationMessageFor(model => model.UserName)
+    </div>
+        
+    <p></p>
+
+    <div>
+        @Html.LabelFor(model => model.Password)
+        @Html.PasswordFor(model => model.Password)
+        @Html.ValidationMessageFor(model => model.Password)
+    </div>
+
+    <p></p>
+    <label>
+        <input type="checkbox" asp-for="KeepLoggedIn"></input>
+        Keep me logged in
+    </label>
+    <p></p>
+
+    <button type="submit">Login</button>
+
+    <p></p>
+
+    <p>Or you can register by clicking <a href="/User/Create">here</a></p>
+}

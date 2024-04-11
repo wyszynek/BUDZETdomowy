@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BUDZETdomowy.Data;
 using BUDZETdomowy.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BUDZETdomowy.Controllers
 {
+    [Authorize]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;

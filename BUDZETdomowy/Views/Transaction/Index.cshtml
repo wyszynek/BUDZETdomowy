@@ -12,6 +12,8 @@
     </form>
 </div>
 
+<p></p>
+
 <div class="text-center">
     <form method="post" asp-controller="Transaction" asp-action="ExportToExcel">
         <input type="submit" value="Export data to Excel"></input>
@@ -25,7 +27,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                Category
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Account)
@@ -46,7 +48,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                    <div>
+                        <span>@Html.Raw(item.Category.Icon)</span>
+                        @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                    </div>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Account.AccountName)

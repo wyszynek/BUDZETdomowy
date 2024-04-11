@@ -1,0 +1,88 @@
+﻿@model IEnumerable<dynamic>
+
+<h1>Dashboard</h1>
+
+<!-- Total Income -->
+<p>Total Income: @ViewBag.TotalIncome</p>
+
+<!-- Total Expense -->
+<p>Total Expense: @ViewBag.TotalExpense</p>
+
+<!-- Balance -->
+<p>Balance: @ViewBag.Balance</p>
+
+<!-- Spline Chart - Income vs Expense -->
+<h2>Spline Chart - Income vs Expense</h2>
+<div>
+    <canvas id="splineChart"></canvas>
+</div>
+
+<!-- Recent Transactions -->
+<h2>Recent Transactions</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Note</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in ViewBag.RecentTransactions)
+        {
+            <tr>
+                <td>@transaction.Date.ToString("yyyy-MM-dd")</td>
+                <td>@transaction.Category.CategoryName</td>
+                <td>@transaction.Amount</td>
+                <td>@transaction.Note</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Spline Chart Data
+        var splineChartData = @Html.Raw(Json.Serialize(ViewBag.SplineChartData));
+
+        // Create Spline Chart
+        var ctx = document.getElementById('splineChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: splineChartData.map(data => data.day),
+                datasets: [{
+                    label: 'Income',
+                    data: splineChartData.map(data => data.income),
+                    borderColor: 'green',
+                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                    fill: true
+                }, {
+                    label: 'Expense',
+                    data: splineChartData.map(data => data.expense),
+                    borderColor: 'red',
+                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+}

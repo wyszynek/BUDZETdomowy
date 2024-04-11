@@ -28,22 +28,26 @@ namespace BUDZETdomowy.Models
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
 
-        public void HashPasswordSHA256()
+        public IEnumerable<Account> Accounts { get; set; } = new List<Account>();
+    }
+
+    public class UserHelper
+    {
+        public static string HashSHA256(string password)
         {
-            StringBuilder Sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
             using (SHA256 hash = SHA256Managed.Create())
             {
                 Encoding enc = Encoding.UTF8;
-                byte[] result = hash.ComputeHash(enc.GetBytes(Password));
+                byte[] result = hash.ComputeHash(enc.GetBytes(password));
 
                 foreach (byte b in result)
-                    Sb.Append(b.ToString("x2"));
+                    sb.Append(b.ToString("x2"));
             }
 
-            Password = Sb.ToString();
+            return sb.ToString();
         }
-
-        public IEnumerable<Account> Accounts { get; set; } = new List<Account>();
     }
+
 }

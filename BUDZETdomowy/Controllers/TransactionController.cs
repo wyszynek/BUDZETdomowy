@@ -9,9 +9,11 @@ using BUDZETdomowy.Data;
 using BUDZETdomowy.Models;
 using System.Text;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BUDZETdomowy.Controllers
 {
+    [Authorize]
     public class TransactionController : Controller
     {
         private readonly ApplicationDbContext _context;

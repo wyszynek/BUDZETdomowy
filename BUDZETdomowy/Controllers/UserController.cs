@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BUDZETdomowy.Data;
 using BUDZETdomowy.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BUDZETdomowy.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -43,6 +45,7 @@ namespace BUDZETdomowy.Controllers
             return View(user);
         }
 
+        [AllowAnonymous]
         // GET: User/Create
         public IActionResult Create()
         {
@@ -52,13 +55,14 @@ namespace BUDZETdomowy.Controllers
         // POST: User/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,UserName,FirstName,LastName,Email,Password")] User user)
         {
             if (ModelState.IsValid)
             {
-                user.HashPasswordSHA256();
+                user.Password = UserHelper.HashSHA256(user.Password);
                 _context.Add(user); 
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -96,7 +100,6 @@ namespace BUDZETdomowy.Controllers
 
             if (ModelState.IsValid)
             {
-                user.HashPasswordSHA256();
                 try
                 {
                     _context.Update(user);

@@ -111,15 +111,58 @@ namespace BUDZETdomowy.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(transaction);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // Pobierz konta i kategorię na podstawie ich identyfikatorów
+                var targetAccount = await _context.Accounts.FindAsync(transaction.AccountId);
+                var categoryType = _context.Categories
+                    .Where(c => c.CategoryId == transaction.CategoryId)
+                    .Select(c => c.Type)
+                    .FirstOrDefault();
+
+                if (targetAccount != null && categoryType != null)
+                {
+                    if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
+                    {
+                        ModelState.AddModelError(string.Empty, "Insufficient funds in the account for this expense category.");
+                        PopulateCategoriesAndAccounts();
+                        return View(transaction);
+                    }
+
+                    if (categoryType == "Income")
+                    {
+                        targetAccount.Income += transaction.Amount;
+                        // Dodaj transakcję do kontekstu bazy danych
+                        _context.Add(transaction);
+
+                        // Zapisz zmiany w bazie danych
+                        await _context.SaveChangesAsync();
+
+                        // Przekieruj użytkownika do listy transakcji
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else if (categoryType == "Expense")
+                    {
+                        targetAccount.Expanse += transaction.Amount;
+                        targetAccount.Income -= transaction.Amount;
+                        // Dodaj transakcję do kontekstu bazy danych
+                        _context.Add(transaction);
+
+                        // Zapisz zmiany w bazie danych
+                        await _context.SaveChangesAsync();
+
+                        // Przekieruj użytkownika do listy transakcji
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid category or account selected.");
+                }
             }
+
             PopulateCategoriesAndAccounts();
-            //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transaction.AccountId);
-            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
             return View(transaction);
         }
+
 
         // GET: Transaction/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -134,8 +177,7 @@ namespace BUDZETdomowy.Controllers
             {
                 return NotFound();
             }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transaction.AccountId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
+            PopulateCategoriesAndAccounts();
             return View(transaction);
         }
 
@@ -155,7 +197,46 @@ namespace BUDZETdomowy.Controllers
             {
                 try
                 {
-                    _context.Update(transaction);
+                    var originalTransaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == id);
+                    var targetAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
+                    var categoryType = _context.Categories
+                    .Where(c => c.CategoryId == transaction.CategoryId)
+                    .Select(c => c.Type)
+                    .FirstOrDefault();
+                    if (targetAccount != null && categoryType != null)
+                    {
+                        if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
+                        {
+                            ModelState.AddModelError(string.Empty, "Insufficient funds in the account for this expense category.");
+                            PopulateCategoriesAndAccounts();
+                            return View(transaction);
+                        }
+
+                        if (categoryType == "Income")
+                        {
+                            targetAccount.Income -= originalTransaction.Amount;
+                            _context.Update(transaction);
+                            targetAccount.Income += transaction.Amount;
+
+                            await _context.SaveChangesAsync();
+
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else if (categoryType == "Expense")
+                        {
+                            targetAccount.Expanse -= originalTransaction.Amount;
+                            targetAccount.Income += originalTransaction.Amount;
+                            _context.Update(transaction);
+                            
+                            targetAccount.Income -= transaction.Amount;
+                            targetAccount.Expanse += transaction.Amount;
+
+                            await _context.SaveChangesAsync();
+
+                            return RedirectToAction(nameof(Index));
+                        }
+                    }
+                        _context.Update(transaction);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -171,8 +252,7 @@ namespace BUDZETdomowy.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transaction.AccountId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", transaction.CategoryId);
+            PopulateCategoriesAndAccounts();
             return View(transaction);
         }
 
@@ -201,13 +281,48 @@ namespace BUDZETdomowy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction != null)
+            var transaction = await _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .FirstOrDefaultAsync(m => m.TransactionId == id);
+            var targetAccount = transaction.Account;
+            var categoryType = _context.Categories
+            .Where(c => c.CategoryId == transaction.CategoryId)
+            .Select(c => c.Type)
+            .FirstOrDefault();
+
+            if (transaction == null)
             {
-                _context.Transactions.Remove(transaction);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            if (categoryType == "Income") 
+            {
+                targetAccount.Income -= transaction.Amount;
+            }
+            else if (categoryType == "Expense")
+            {
+                targetAccount.Expanse -= transaction.Amount;
+                targetAccount.Income += transaction.Amount;
+            }
+
+            try
+            {
+                _context.Transactions.Remove(transaction);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TransactionExists(transaction.TransactionId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

@@ -111,15 +111,47 @@ namespace BUDZETdomowy.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(transactionBetweenAccounts);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // Pobierz konta nadawcy i odbiorcy na podstawie ich identyfikatorów
+                var senderAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.SenderId);
+                var recipientAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.RecipientId);
+
+                if (senderAccount != null && recipientAccount != null && senderAccount != recipientAccount)
+                {
+                    // Sprawdź, czy nadawca ma wystarczająco środków na koncie
+                    if (senderAccount.Income >= transactionBetweenAccounts.Amount)
+                    {
+                        // Zaktualizuj wartości Income i Expanse dla konta nadawcy i odbiorcy
+                        senderAccount.Expanse += transactionBetweenAccounts.Amount;
+                        recipientAccount.Income += transactionBetweenAccounts.Amount;
+
+                        // Zaktualizuj wartość Income dla konta nadawcy
+                        senderAccount.Income -= transactionBetweenAccounts.Amount;
+
+                        // Dodaj transakcję do kontekstu bazy danych
+                        _context.Add(transactionBetweenAccounts);
+
+                        // Zapisz zmiany w bazie danych
+                        await _context.SaveChangesAsync();
+
+                        // Przekieruj użytkownika do listy transakcji
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Insufficient funds in the sender's account.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Same account detected.");
+                }
             }
+            // Wypełnij listę kont przed wyświetleniem widoku
             PopulateAccount();
-            //ViewData["RecipientId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.RecipientId);
-            //ViewData["SenderId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.SenderId);
             return View(transactionBetweenAccounts);
         }
+
+
 
         // GET: TransactionBetweenAccounts/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -134,11 +166,13 @@ namespace BUDZETdomowy.Controllers
             {
                 return NotFound();
             }
-            ViewData["RecipientId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.RecipientId);
-            ViewData["SenderId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.SenderId);
+            PopulateAccount();            
             return View(transactionBetweenAccounts);
         }
 
+        // POST: TransactionBetweenAccounts/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         // POST: TransactionBetweenAccounts/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -155,8 +189,39 @@ namespace BUDZETdomowy.Controllers
             {
                 try
                 {
-                    _context.Update(transactionBetweenAccounts);
-                    await _context.SaveChangesAsync();
+                    var originalTransaction = await _context.TransactionBetweenAccounts.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == id);
+
+                    var senderAccount = await _context.Accounts.FindAsync(originalTransaction.SenderId);
+                    var recipientAccount = await _context.Accounts.FindAsync(originalTransaction.RecipientId);
+
+                    if (senderAccount != null && recipientAccount != null && senderAccount != recipientAccount)
+                    {
+                        senderAccount.Income += originalTransaction.Amount;
+                        recipientAccount.Income -= originalTransaction.Amount;
+                        senderAccount.Expanse -= originalTransaction.Amount;
+
+                        if (senderAccount.Income >= transactionBetweenAccounts.Amount)
+                        {
+                            _context.Update(transactionBetweenAccounts);
+
+                            senderAccount.Expanse += transactionBetweenAccounts.Amount;
+                            recipientAccount.Income += transactionBetweenAccounts.Amount;
+
+                            senderAccount.Income -= transactionBetweenAccounts.Amount;
+
+                            await _context.SaveChangesAsync();
+
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "Insufficient funds in the sender's account after editing.");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Same account detected.");
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -169,12 +234,12 @@ namespace BUDZETdomowy.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["RecipientId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.RecipientId);
-            ViewData["SenderId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", transactionBetweenAccounts.SenderId);
+
+            PopulateAccount();
             return View(transactionBetweenAccounts);
         }
+
 
         // GET: TransactionBetweenAccounts/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -201,15 +266,46 @@ namespace BUDZETdomowy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var transactionBetweenAccounts = await _context.TransactionBetweenAccounts.FindAsync(id);
-            if (transactionBetweenAccounts != null)
+            var transactionBetweenAccounts = await _context.TransactionBetweenAccounts
+                .Include(t => t.SenderAccount)
+                .Include(t => t.RecipientAccount)
+                .FirstOrDefaultAsync(m => m.TransactionId == id);
+
+            if (transactionBetweenAccounts == null)
             {
-                _context.TransactionBetweenAccounts.Remove(transactionBetweenAccounts);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            // Pobierz konta nadawcy i odbiorcy na podstawie identyfikatorów
+            var senderAccount = transactionBetweenAccounts.SenderAccount;
+            var recipientAccount = transactionBetweenAccounts.RecipientAccount;
+
+            // Zwróć kwotę do konta nadawcy i usuń ją z konta odbiorcy
+            senderAccount.Income += transactionBetweenAccounts.Amount;
+            senderAccount.Expanse -= transactionBetweenAccounts.Amount;
+            recipientAccount.Income -= transactionBetweenAccounts.Amount;
+
+            try
+            {
+                // Usuń transakcję z kontekstu bazy danych
+                _context.TransactionBetweenAccounts.Remove(transactionBetweenAccounts);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TransactionBetweenAccountsExists(transactionBetweenAccounts.TransactionId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool TransactionBetweenAccountsExists(int id)
         {

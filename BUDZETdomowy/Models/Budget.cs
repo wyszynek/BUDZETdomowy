@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BUDZETdomowy.Models
@@ -29,7 +30,7 @@ namespace BUDZETdomowy.Models
         public int AccountId { get; set; }
         public Account? Account { get; set; }
 
-        [Required(ErrorMessage = "Please enter the limit")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Limit should be greater than 0.")]
         [Column(TypeName = "decimal(18, 2)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal Limit { get; set; }

@@ -23,6 +23,11 @@ namespace BUDZETdomowy.Models
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal Expanse { get; set; }
 
-        public decimal Balance => Income - Expanse; 
+        public decimal Balance => Income - Expanse;
+
+        public Account()
+        {
+            Expanse = 0;
+        }
     }
 }

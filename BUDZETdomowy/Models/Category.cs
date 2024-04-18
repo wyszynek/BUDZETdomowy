@@ -1,12 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BUDZETdomowy.Models
+namespace HomeBudget.Models
 {
     public class Category
     {
         [Key]
-        public int CategoryId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Please enter the name of the category")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Category should be between 2 and 20 characters")]
@@ -17,5 +18,8 @@ namespace BUDZETdomowy.Models
 
         [Column(TypeName = "nvarchar(50)")]
         public string Type { get; set; } = "Expense";
+
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
 }

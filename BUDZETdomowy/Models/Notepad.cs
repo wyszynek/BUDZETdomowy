@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BUDZETdomowy.Models
+namespace HomeBudget.Models
 {
     public class Notepad
     {
         [Key]
-        public int NoteID { get; set; }
+        public int Id { get; set; }
 
         public DateTime Date { get; set; } = DateTime.Now;
 

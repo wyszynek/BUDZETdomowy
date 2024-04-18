@@ -1,4 +1,4 @@
-using BUDZETdomowy.Data;
+using HomeBudget.Data;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;

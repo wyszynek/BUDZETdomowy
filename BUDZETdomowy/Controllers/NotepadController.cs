@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BUDZETdomowy.Data;
-using BUDZETdomowy.Models;
+using HomeBudget.Data;
+using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BUDZETdomowy.Controllers
+namespace HomeBudget.Controllers
 {
     [Authorize]
     public class NotepadController : Controller
@@ -36,7 +36,7 @@ namespace BUDZETdomowy.Controllers
             }
 
             var notepad = await _context.Notepad
-                .FirstOrDefaultAsync(m => m.NoteID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (notepad == null)
             {
                 return NotFound();
@@ -96,7 +96,7 @@ namespace BUDZETdomowy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("NoteID,Date,Title,Description")] Notepad notepad)
         {
-            if (id != notepad.NoteID)
+            if (id != notepad.Id)
             {
                 return NotFound();
             }
@@ -110,7 +110,7 @@ namespace BUDZETdomowy.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NotepadExists(notepad.NoteID))
+                    if (!NotepadExists(notepad.Id))
                     {
                         return NotFound();
                     }
@@ -133,7 +133,7 @@ namespace BUDZETdomowy.Controllers
             }
 
             var notepad = await _context.Notepad
-                .FirstOrDefaultAsync(m => m.NoteID == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (notepad == null)
             {
                 return NotFound();
@@ -159,7 +159,7 @@ namespace BUDZETdomowy.Controllers
 
         private bool NotepadExists(int id)
         {
-            return _context.Notepad.Any(e => e.NoteID == id);
+            return _context.Notepad.Any(e => e.Id == id);
         }
     }
 }

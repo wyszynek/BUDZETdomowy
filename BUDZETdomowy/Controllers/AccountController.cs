@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BUDZETdomowy.Data;
-using BUDZETdomowy.Models;
+using HomeBudget.Data;
+using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BUDZETdomowy.Controllers
+namespace HomeBudget.Controllers
 {
     [Authorize]
     public class AccountController : Controller
@@ -36,7 +36,7 @@ namespace BUDZETdomowy.Controllers
             }
 
             var account = await _context.Accounts
-                .FirstOrDefaultAsync(m => m.AccountId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (account == null)
             {
                 return NotFound();
@@ -90,7 +90,7 @@ namespace BUDZETdomowy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AccountId,AccountName,Note,Income,Expanse")] Account account)
         {
-            if (id != account.AccountId)
+            if (id != account.Id)
             {
                 return NotFound();
             }
@@ -104,7 +104,7 @@ namespace BUDZETdomowy.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AccountExists(account.AccountId))
+                    if (!AccountExists(account.Id))
                     {
                         return NotFound();
                     }
@@ -127,7 +127,7 @@ namespace BUDZETdomowy.Controllers
             }
 
             var account = await _context.Accounts
-                .FirstOrDefaultAsync(m => m.AccountId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (account == null)
             {
                 return NotFound();
@@ -153,7 +153,7 @@ namespace BUDZETdomowy.Controllers
 
         private bool AccountExists(int id)
         {
-            return _context.Accounts.Any(e => e.AccountId == id);
+            return _context.Accounts.Any(e => e.Id == id);
         }
     }
 }

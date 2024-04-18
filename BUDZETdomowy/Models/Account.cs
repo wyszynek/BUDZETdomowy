@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BUDZETdomowy.Models
+namespace HomeBudget.Models
 {
     public class Account
     {
         [Key]
-        public int AccountId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Please enter name of the account")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Name should be between 2 and 20 characters")]

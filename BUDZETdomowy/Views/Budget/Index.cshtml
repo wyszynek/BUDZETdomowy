@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BUDZETdomowy.Models.Budget>
+﻿@model IEnumerable<HomeBudget.Models.Budget>
 
 @{
     ViewData["Title"] = "Index";
@@ -55,9 +55,9 @@
                 @Html.DisplayFor(modelItem => item.EndTime)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.BudgetId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BudgetId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BudgetId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

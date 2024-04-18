@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BUDZETdomowy.Data;
-using BUDZETdomowy.Models;
+using HomeBudget.Data;
+using HomeBudget.Models;
 using ClosedXML.Excel;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Storage;
 
-namespace BUDZETdomowy.Controllers
+namespace HomeBudget.Controllers
 {
     [Authorize]
     public class TransactionBetweenAccountsController : Controller
@@ -22,7 +23,6 @@ namespace BUDZETdomowy.Controllers
         {
             _context = context;
         }
-
         public IActionResult ExportToCSV()
         {
             var builder = new StringBuilder();
@@ -84,7 +84,7 @@ namespace BUDZETdomowy.Controllers
             var transactionBetweenAccounts = await _context.TransactionBetweenAccounts
                 .Include(t => t.RecipientAccount)
                 .Include(t => t.SenderAccount)
-                .FirstOrDefaultAsync(m => m.TransactionId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (transactionBetweenAccounts == null)
             {
                 return NotFound();
@@ -111,29 +111,22 @@ namespace BUDZETdomowy.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Pobierz konta nadawcy i odbiorcy na podstawie ich identyfikatorów
                 var senderAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.SenderId);
                 var recipientAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.RecipientId);
 
                 if (senderAccount != null && recipientAccount != null && senderAccount != recipientAccount)
                 {
-                    // Sprawdź, czy nadawca ma wystarczająco środków na koncie
                     if (senderAccount.Income >= transactionBetweenAccounts.Amount)
                     {
-                        // Zaktualizuj wartości Income i Expanse dla konta nadawcy i odbiorcy
                         senderAccount.Expanse += transactionBetweenAccounts.Amount;
                         recipientAccount.Income += transactionBetweenAccounts.Amount;
 
-                        // Zaktualizuj wartość Income dla konta nadawcy
                         senderAccount.Income -= transactionBetweenAccounts.Amount;
 
-                        // Dodaj transakcję do kontekstu bazy danych
                         _context.Add(transactionBetweenAccounts);
 
-                        // Zapisz zmiany w bazie danych
                         await _context.SaveChangesAsync();
 
-                        // Przekieruj użytkownika do listy transakcji
                         return RedirectToAction(nameof(Index));
                     }
                     else
@@ -173,14 +166,11 @@ namespace BUDZETdomowy.Controllers
         // POST: TransactionBetweenAccounts/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        // POST: TransactionBetweenAccounts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date")] TransactionBetweenAccounts transactionBetweenAccounts)
         {
-            if (id != transactionBetweenAccounts.TransactionId)
+            if (id != transactionBetweenAccounts.Id)
             {
                 return NotFound();
             }
@@ -189,7 +179,7 @@ namespace BUDZETdomowy.Controllers
             {
                 try
                 {
-                    var originalTransaction = await _context.TransactionBetweenAccounts.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == id);
+                    var originalTransaction = await _context.TransactionBetweenAccounts.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
 
                     var senderAccount = await _context.Accounts.FindAsync(originalTransaction.SenderId);
                     var recipientAccount = await _context.Accounts.FindAsync(originalTransaction.RecipientId);
@@ -225,7 +215,7 @@ namespace BUDZETdomowy.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TransactionBetweenAccountsExists(transactionBetweenAccounts.TransactionId))
+                    if (!TransactionBetweenAccountsExists(transactionBetweenAccounts.Id))
                     {
                         return NotFound();
                     }
@@ -252,7 +242,7 @@ namespace BUDZETdomowy.Controllers
             var transactionBetweenAccounts = await _context.TransactionBetweenAccounts
                 .Include(t => t.RecipientAccount)
                 .Include(t => t.SenderAccount)
-                .FirstOrDefaultAsync(m => m.TransactionId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (transactionBetweenAccounts == null)
             {
                 return NotFound();
@@ -269,31 +259,28 @@ namespace BUDZETdomowy.Controllers
             var transactionBetweenAccounts = await _context.TransactionBetweenAccounts
                 .Include(t => t.SenderAccount)
                 .Include(t => t.RecipientAccount)
-                .FirstOrDefaultAsync(m => m.TransactionId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (transactionBetweenAccounts == null)
             {
                 return NotFound();
             }
 
-            // Pobierz konta nadawcy i odbiorcy na podstawie identyfikatorów
             var senderAccount = transactionBetweenAccounts.SenderAccount;
             var recipientAccount = transactionBetweenAccounts.RecipientAccount;
 
-            // Zwróć kwotę do konta nadawcy i usuń ją z konta odbiorcy
             senderAccount.Income += transactionBetweenAccounts.Amount;
             senderAccount.Expanse -= transactionBetweenAccounts.Amount;
             recipientAccount.Income -= transactionBetweenAccounts.Amount;
 
             try
             {
-                // Usuń transakcję z kontekstu bazy danych
                 _context.TransactionBetweenAccounts.Remove(transactionBetweenAccounts);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TransactionBetweenAccountsExists(transactionBetweenAccounts.TransactionId))
+                if (!TransactionBetweenAccountsExists(transactionBetweenAccounts.Id))
                 {
                     return NotFound();
                 }
@@ -309,13 +296,13 @@ namespace BUDZETdomowy.Controllers
 
         private bool TransactionBetweenAccountsExists(int id)
         {
-            return _context.TransactionBetweenAccounts.Any(e => e.TransactionId == id);
+            return _context.TransactionBetweenAccounts.Any(e => e.Id == id);
         }
 
         public void PopulateAccount()
         {
             var AccountsCollection = _context.Accounts.ToList();
-            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose an account" };
+            Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an account" };
             AccountsCollection.Insert(0, DefaultAccount);
             ViewBag.Accounts = AccountsCollection;
         }

@@ -1,4 +1,4 @@
-﻿namespace BUDZETdomowy.Models
+﻿namespace HomeBudget.Models
 {
     public class Login
     {   

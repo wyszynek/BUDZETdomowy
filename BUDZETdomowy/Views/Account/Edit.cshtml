@@ -1,4 +1,4 @@
-﻿@model BUDZETdomowy.Models.Account
+﻿@model HomeBudget.Models.Account
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,7 +12,7 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AccountId" />
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="AccountName" class="control-label"></label>
                 <input asp-for="AccountName" class="form-control" />

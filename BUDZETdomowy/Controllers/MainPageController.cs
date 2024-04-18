@@ -1,13 +1,13 @@
-﻿using BUDZETdomowy.Models;
+﻿using HomeBudget.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using BUDZETdomowy.Data;
+using HomeBudget.Data;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BUDZETdomowy.Controllers
+namespace HomeBudget.Controllers
 {
     [Authorize]
     public class MainPageController : Controller

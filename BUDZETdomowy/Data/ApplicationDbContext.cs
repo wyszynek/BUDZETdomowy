@@ -1,7 +1,7 @@
-﻿using BUDZETdomowy.Models;
+﻿using HomeBudget.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BUDZETdomowy.Data
+namespace HomeBudget.Data
 {
     public class ApplicationDbContext : DbContext
     {

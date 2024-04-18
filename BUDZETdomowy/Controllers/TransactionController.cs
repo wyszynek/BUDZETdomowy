@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BUDZETdomowy.Data;
-using BUDZETdomowy.Models;
+using HomeBudget.Data;
+using HomeBudget.Models;
 using System.Text;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BUDZETdomowy.Controllers
+namespace HomeBudget.Controllers
 {
     [Authorize]
     public class TransactionController : Controller
@@ -84,7 +84,7 @@ namespace BUDZETdomowy.Controllers
             var transaction = await _context.Transactions
                 .Include(t => t.Account)
                 .Include(t => t.Category)
-                .FirstOrDefaultAsync(m => m.TransactionId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (transaction == null)
             {
                 return NotFound();
@@ -114,7 +114,7 @@ namespace BUDZETdomowy.Controllers
                 // Pobierz konta i kategorię na podstawie ich identyfikatorów
                 var targetAccount = await _context.Accounts.FindAsync(transaction.AccountId);
                 var categoryType = _context.Categories
-                    .Where(c => c.CategoryId == transaction.CategoryId)
+                    .Where(c => c.Id == transaction.CategoryId)
                     .Select(c => c.Type)
                     .FirstOrDefault();
 
@@ -188,7 +188,7 @@ namespace BUDZETdomowy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
         {
-            if (id != transaction.TransactionId)
+            if (id != transaction.Id)
             {
                 return NotFound();
             }
@@ -197,10 +197,10 @@ namespace BUDZETdomowy.Controllers
             {
                 try
                 {
-                    var originalTransaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == id);
+                    var originalTransaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
                     var targetAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
                     var categoryType = _context.Categories
-                    .Where(c => c.CategoryId == transaction.CategoryId)
+                    .Where(c => c.Id == transaction.CategoryId)
                     .Select(c => c.Type)
                     .FirstOrDefault();
                     if (targetAccount != null && categoryType != null)
@@ -241,7 +241,7 @@ namespace BUDZETdomowy.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TransactionExists(transaction.TransactionId))
+                    if (!TransactionExists(transaction.Id))
                     {
                         return NotFound();
                     }
@@ -267,7 +267,7 @@ namespace BUDZETdomowy.Controllers
             var transaction = await _context.Transactions
                 .Include(t => t.Account)
                 .Include(t => t.Category)
-                .FirstOrDefaultAsync(m => m.TransactionId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (transaction == null)
             {
                 return NotFound();
@@ -284,10 +284,10 @@ namespace BUDZETdomowy.Controllers
             var transaction = await _context.Transactions
             .Include(t => t.Account)
             .Include(t => t.Category)
-            .FirstOrDefaultAsync(m => m.TransactionId == id);
+            .FirstOrDefaultAsync(m => m.Id == id);
             var targetAccount = transaction.Account;
             var categoryType = _context.Categories
-            .Where(c => c.CategoryId == transaction.CategoryId)
+            .Where(c => c.Id == transaction.CategoryId)
             .Select(c => c.Type)
             .FirstOrDefault();
 
@@ -313,7 +313,7 @@ namespace BUDZETdomowy.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TransactionExists(transaction.TransactionId))
+                if (!TransactionExists(transaction.Id))
                 {
                     return NotFound();
                 }
@@ -328,18 +328,18 @@ namespace BUDZETdomowy.Controllers
 
         private bool TransactionExists(int id)
         {
-            return _context.Transactions.Any(e => e.TransactionId == id);
+            return _context.Transactions.Any(e => e.Id == id);
         }
 
         public void PopulateCategoriesAndAccounts()
         {
             var CategoryCollection = _context.Categories.ToList();
-            Category DefaultCategory = new Category() { CategoryId = 0, CategoryName = "Choose a Category" };
+            Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
             CategoryCollection.Insert(0, DefaultCategory);
             ViewBag.Categories = CategoryCollection;
 
             var AccountsCollection = _context.Accounts.ToList();
-            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose an Account" };
+            Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
             AccountsCollection.Insert(0, DefaultAccount);
             ViewBag.Accounts = AccountsCollection;
         }

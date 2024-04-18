@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BUDZETdomowy.Models
+namespace HomeBudget.Models
 {
     public class CheckDateAttribute : ValidationAttribute
     {
@@ -16,7 +16,7 @@ namespace BUDZETdomowy.Models
     public class Budget
     {
         [Key]
-        public int BudgetId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Please enter the budget name")]
         [StringLength(25, MinimumLength = 2, ErrorMessage = "Name should be between 2 and 25 characters")]
@@ -34,6 +34,9 @@ namespace BUDZETdomowy.Models
         [Column(TypeName = "decimal(18, 2)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal Limit { get; set; }
+
+        //chyba potrzebna jeszcze zmienna ktora bedzie przetrzymywac sume wszystkich transakcji danej kategorii, 
+        //dzieki ktorej bedzie mozna latwiej obliczyc postep zakonczenia budzetu
 
         public DateTime CreationTime { get; set; } = DateTime.Now;
 

@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace BUDZETdomowy.Models
+namespace HomeBudget.Models
 {
     public class User
     {
         [Key]
-        public int UserId { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Please enter the user name")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Name should be between 2 and 30 characters")]

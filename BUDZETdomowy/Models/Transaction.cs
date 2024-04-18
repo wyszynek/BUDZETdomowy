@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BUDZETdomowy.Models
+namespace HomeBudget.Models
 {
     public class Transaction
     {
         [Key]
-        public int TransactionId { get; set; }
+        public int Id { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Please select a category.")]
         public int CategoryId { get; set; }

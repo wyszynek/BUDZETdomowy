@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace BUDZETdomowy.Models
+namespace HomeBudget.Models
 {
     public class TransactionBetweenAccounts
     {
         [Key]
-        public int TransactionId { get; set; }
+        public int Id { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Please select a sender account.")]
         public int? SenderId { get; set; }

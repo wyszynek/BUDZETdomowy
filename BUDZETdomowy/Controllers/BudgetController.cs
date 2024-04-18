@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BUDZETdomowy.Data;
-using BUDZETdomowy.Models;
+using HomeBudget.Data;
+using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BUDZETdomowy.Controllers
+namespace HomeBudget.Controllers
 {
     [Authorize]
     public class BudgetController : Controller
@@ -39,7 +39,7 @@ namespace BUDZETdomowy.Controllers
             var budget = await _context.Budgets
                 .Include(b => b.Account)
                 .Include(b => b.Category)
-                .FirstOrDefaultAsync(m => m.BudgetId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (budget == null)
             {
                 return NotFound();
@@ -101,7 +101,7 @@ namespace BUDZETdomowy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,CreationTime,EndTime")] Budget budget)
         {
-            if (id != budget.BudgetId)
+            if (id != budget.Id)
             {
                 return NotFound();
             }
@@ -115,7 +115,7 @@ namespace BUDZETdomowy.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BudgetExists(budget.BudgetId))
+                    if (!BudgetExists(budget.Id))
                     {
                         return NotFound();
                     }
@@ -142,7 +142,7 @@ namespace BUDZETdomowy.Controllers
             var budget = await _context.Budgets
                 .Include(b => b.Account)
                 .Include(b => b.Category)
-                .FirstOrDefaultAsync(m => m.BudgetId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (budget == null)
             {
                 return NotFound();
@@ -168,19 +168,19 @@ namespace BUDZETdomowy.Controllers
 
         private bool BudgetExists(int id)
         {
-            return _context.Budgets.Any(e => e.BudgetId == id);
+            return _context.Budgets.Any(e => e.Id == id);
         }
 
         [NonAction]
         public void PopulateCategoriesAndAccounts()
         {
             var CategoryCollection = _context.Categories.ToList();
-            Category DefaultCategory = new Category() { CategoryId = 0, CategoryName = "Choose a Category" };
+            Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
             CategoryCollection.Insert(0, DefaultCategory);
             ViewBag.Categories = CategoryCollection;
 
             var AccountsCollection = _context.Accounts.ToList();
-            Account DefaultAccount = new Account() { AccountId = 0, AccountName = "Choose an Account" };
+            Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
             AccountsCollection.Insert(0, DefaultAccount);
             ViewBag.Accounts = AccountsCollection;
         }

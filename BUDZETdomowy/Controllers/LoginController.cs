@@ -1,12 +1,12 @@
-﻿using BUDZETdomowy.Data;
-using BUDZETdomowy.Models;
+﻿using HomeBudget.Data;
+using HomeBudget.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
-namespace BUDZETdomowy.Controllers
+namespace HomeBudget.Controllers
 {
     public class LoginController : Controller
     {
@@ -42,31 +42,29 @@ namespace BUDZETdomowy.Controllers
                 ModelState.AddModelError("", "Such user does not exist");
                 return View(model);
             }
-            else if (user.Password != UserHelper.HashSHA256(model.Password))
+
+            if (user.Password != UserHelper.HashSHA256(model.Password))
             {
                 ModelState.AddModelError("", "Invalid password.");
                 return View(model);
-
             }
-            else
+
+            List<Claim> claims = new List<Claim>()
             {
-                List<Claim> claims = new List<Claim>()
-                {
-                    new Claim(ClaimTypes.NameIdentifier, model.UserName),
-                    new Claim("OtherProperties", "Example Role")
-                };
+                new Claim("Id", user.Id.ToString())
+            };
 
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                AuthenticationProperties properties = new AuthenticationProperties()
-                {
-                    AllowRefresh = true,
-                    IsPersistent = model.KeepLoggedIn
-                };
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            AuthenticationProperties properties = new AuthenticationProperties()
+            {
+                AllowRefresh = true,
+                IsPersistent = model.KeepLoggedIn
+            };
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), properties);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), properties);
 
-                return RedirectToAction("Index", "Home");
-            }
+            return RedirectToAction("Index", "Home");
+            
         }
     }
 }

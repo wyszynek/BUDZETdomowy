@@ -1,4 +1,4 @@
-﻿@model BUDZETdomowy.Models.TransactionBetweenAccounts
+﻿@model HomeBudget.Models.TransactionBetweenAccounts
 
 @{
     ViewData["Title"] = "Create";
@@ -17,14 +17,14 @@
                 <select asp-for="SenderId" class="form-control">
                     @foreach (var senderAccount in ViewBag.Accounts)
                     {
-                        if (senderAccount.AccountId != 0) // Sprawdzenie, czy kategoria nie jest domyślna
+                        if (senderAccount.Id != 0) // Sprawdzenie, czy kategoria nie jest domyślna
                         {
                             string accountInfo = $"{senderAccount.AccountName} - {senderAccount.Income}";
-                            <option value="@senderAccount.AccountId">@accountInfo</option>
+                            <option value="@senderAccount.Id">@accountInfo</option>
                         }
                         else
                         {
-                            <option value="@senderAccount.AccountId">@senderAccount.AccountName</option>
+                            <option value="@senderAccount.Id">@senderAccount.AccountName</option>
                         }
                     }
                 </select>
@@ -35,14 +35,14 @@
                 <select asp-for="RecipientId" class="form-control">
                     @foreach (var recipientAccount in ViewBag.Accounts)
                     {
-                        if (recipientAccount.AccountId != 0)
+                        if (recipientAccount.Id != 0)
                         {
                             string accountInfo = $"{recipientAccount.AccountName} - {recipientAccount.Income}";
-                            <option value="@recipientAccount.AccountId">@accountInfo</option>
+                            <option value="@recipientAccount.Id">@accountInfo</option>
                         }
                         else
                         {
-                            <option value="@recipientAccount.AccountId">@recipientAccount.AccountName</option>
+                            <option value="@recipientAccount.Id">@recipientAccount.AccountName</option>
                         }
                     }
                 </select>

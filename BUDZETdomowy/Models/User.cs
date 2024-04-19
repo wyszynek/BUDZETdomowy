@@ -28,8 +28,6 @@ namespace HomeBudget.Models
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
-
-        public IEnumerable<Account> Accounts { get; set; } = new List<Account>();
     }
 
     public class UserHelper

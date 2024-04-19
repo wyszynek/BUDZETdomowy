@@ -44,5 +44,8 @@ namespace HomeBudget.Models
         [DataType(DataType.DateTime)]
         [CheckDate(ErrorMessage = "You cannot enter the date in the past!")]
         public DateTime EndTime { get; set; } = DateTime.Now;
+
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
 }

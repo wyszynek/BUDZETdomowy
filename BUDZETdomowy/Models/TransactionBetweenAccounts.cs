@@ -25,5 +25,8 @@ namespace HomeBudget.Models
         public string? Note { get; set; }
 
         public DateTime Date { get; set; } = DateTime.Now;
+
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
 }

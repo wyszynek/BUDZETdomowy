@@ -15,5 +15,8 @@ namespace HomeBudget.Models
 
         [Column(TypeName = "nvarchar(1000)")]
         public string? Description { get; set; }
+
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
 }

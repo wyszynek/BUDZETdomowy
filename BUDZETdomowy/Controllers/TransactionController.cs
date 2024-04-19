@@ -26,15 +26,24 @@ namespace HomeBudget.Controllers
         // GET: Transaction
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Category);
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Category).Where(t => t.UserId.ToString() == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
         public IActionResult ExportToCSV()
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var transactions = _context.Transactions
+                .Include(t => t.Category)
+                .Include(t => t.Account)
+                .Where(t => t.UserId.ToString() == currentUserId)
+                .ToList();
+
             var builder = new StringBuilder();
             builder.AppendLine("Category, Account, Amount, Date");
-            foreach (var transaction in _context.Transactions.Include(t => t.Category).Include(t => t.Account))
+
+            foreach (var transaction in transactions)
             {
                 string categoryName = transaction.Category?.CategoryName ?? "Unknown";
                 string accountName = transaction.Account?.AccountName ?? "Unknown";
@@ -46,6 +55,13 @@ namespace HomeBudget.Controllers
 
         public IActionResult ExportToExcel()
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var transactions = _context.Transactions
+                .Include(t => t.Category)
+                .Include(t => t.Account)
+                .Where(t => t.UserId.ToString() == currentUserId)
+                .ToList();
+
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("Transactions");
@@ -54,7 +70,8 @@ namespace HomeBudget.Controllers
                 worksheet.Cell(currentRow, 2).Value = "Account";
                 worksheet.Cell(currentRow, 3).Value = "Amount";
                 worksheet.Cell(currentRow, 4).Value = "Date";
-                foreach (var transaction in _context.Transactions.Include(t => t.Category).Include(t => t.Account))
+
+                foreach (var transaction in transactions)
                 {
                     currentRow++;
                     string categoryName = transaction.Category?.CategoryName ?? "Unknown";
@@ -64,6 +81,7 @@ namespace HomeBudget.Controllers
                     worksheet.Cell(currentRow, 3).Value = transaction.Amount;
                     worksheet.Cell(currentRow, 4).Value = transaction.Date;
                 }
+
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
@@ -109,6 +127,10 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            transaction.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(transaction);
+
             if (ModelState.IsValid)
             {
                 // Pobierz konta i kategorię na podstawie ich identyfikatorów
@@ -333,15 +355,17 @@ namespace HomeBudget.Controllers
 
         public void PopulateCategoriesAndAccounts()
         {
-            var CategoryCollection = _context.Categories.ToList();
-            Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
-            CategoryCollection.Insert(0, DefaultCategory);
-            ViewBag.Categories = CategoryCollection;
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
 
-            var AccountsCollection = _context.Accounts.ToList();
+            var userCategories = _context.Categories.Where(c => c.UserId.ToString() == currentUserId).ToList();
+            Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
+            userCategories.Insert(0, DefaultCategory);
+            ViewBag.Categories = userCategories;
+
+            var userAccounts = _context.Accounts.Where(a => a.UserId.ToString() == currentUserId).ToList();
             Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
-            AccountsCollection.Insert(0, DefaultAccount);
-            ViewBag.Accounts = AccountsCollection;
+            userAccounts.Insert(0, DefaultAccount);
+            ViewBag.Accounts = userAccounts;
         }
     }
 }

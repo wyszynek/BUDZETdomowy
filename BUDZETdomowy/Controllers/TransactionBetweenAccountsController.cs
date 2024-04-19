@@ -39,6 +39,13 @@ namespace HomeBudget.Controllers
 
         public IActionResult ExportToExcel()
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var transactionBetweenAccounts = _context.TransactionBetweenAccounts
+                .Include(t => t.SenderAccount)
+                .Include(t => t.RecipientAccount)
+                .Where(t => t.UserId.ToString() == currentUserId)
+                .ToList();
+
             using (var workbook = new XLWorkbook())
             {
                 var worksheet = workbook.Worksheets.Add("TransactionBetweenAccounts");
@@ -47,7 +54,8 @@ namespace HomeBudget.Controllers
                 worksheet.Cell(currentRow, 2).Value = "Recipient";
                 worksheet.Cell(currentRow, 3).Value = "Amount";
                 worksheet.Cell(currentRow, 4).Value = "Date";
-                foreach (var TBA in _context.TransactionBetweenAccounts.Include(t => t.SenderAccount).Include(t => t.RecipientAccount))
+
+                foreach (var TBA in transactionBetweenAccounts)
                 {
                     currentRow++;
                     string senderName = TBA.SenderAccount?.AccountName ?? "Unknown";
@@ -69,7 +77,8 @@ namespace HomeBudget.Controllers
         // GET: TransactionBetweenAccounts
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.TransactionBetweenAccounts.Include(t => t.RecipientAccount).Include(t => t.SenderAccount);
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var applicationDbContext = _context.TransactionBetweenAccounts.Include(t => t.RecipientAccount).Include(t => t.SenderAccount).Where(t => t.UserId.ToString() == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -109,6 +118,10 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date")] TransactionBetweenAccounts transactionBetweenAccounts)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            transactionBetweenAccounts.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(transactionBetweenAccounts);
+
             if (ModelState.IsValid)
             {
                 var senderAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.SenderId);
@@ -301,10 +314,12 @@ namespace HomeBudget.Controllers
 
         public void PopulateAccount()
         {
-            var AccountsCollection = _context.Accounts.ToList();
-            Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an account" };
-            AccountsCollection.Insert(0, DefaultAccount);
-            ViewBag.Accounts = AccountsCollection;
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+
+            var userAccounts = _context.Accounts.Where(a => a.UserId.ToString() == currentUserId).ToList();
+            Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
+            userAccounts.Insert(0, DefaultAccount);
+            ViewBag.Accounts = userAccounts;
         }
     }
 }

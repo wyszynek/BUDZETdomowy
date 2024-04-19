@@ -44,7 +44,7 @@ namespace HomeBudget.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(75)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -82,11 +82,16 @@ namespace HomeBudget.Migrations
                     b.Property<decimal>("Limit")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Budgets");
                 });
@@ -140,7 +145,12 @@ namespace HomeBudget.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(35)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Notepad");
                 });
@@ -168,11 +178,16 @@ namespace HomeBudget.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(75)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Transactions");
                 });
@@ -200,11 +215,16 @@ namespace HomeBudget.Migrations
                     b.Property<int?>("SenderId")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RecipientId");
 
                     b.HasIndex("SenderId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TransactionBetweenAccounts");
                 });
@@ -247,9 +267,13 @@ namespace HomeBudget.Migrations
 
             modelBuilder.Entity("HomeBudget.Models.Account", b =>
                 {
-                    b.HasOne("HomeBudget.Models.User", null)
-                        .WithMany("Accounts")
-                        .HasForeignKey("UserId");
+                    b.HasOne("HomeBudget.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Budget", b =>
@@ -263,15 +287,34 @@ namespace HomeBudget.Migrations
                     b.HasOne("HomeBudget.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("HomeBudget.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Account");
 
                     b.Navigation("Category");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Category", b =>
+                {
+                    b.HasOne("HomeBudget.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HomeBudget.Models.Notepad", b =>
                 {
                     b.HasOne("HomeBudget.Models.User", "User")
                         .WithMany()
@@ -293,12 +336,20 @@ namespace HomeBudget.Migrations
                     b.HasOne("HomeBudget.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("HomeBudget.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Account");
 
                     b.Navigation("Category");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeBudget.Models.TransactionBetweenAccounts", b =>
@@ -311,14 +362,17 @@ namespace HomeBudget.Migrations
                         .WithMany()
                         .HasForeignKey("SenderId");
 
+                    b.HasOne("HomeBudget.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("RecipientAccount");
 
                     b.Navigation("SenderAccount");
-                });
 
-            modelBuilder.Entity("HomeBudget.Models.User", b =>
-                {
-                    b.Navigation("Accounts");
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -22,33 +22,32 @@ namespace HomeBudget.Controllers
 
         public async Task<ActionResult> Index()
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+
             //Last 7 Days
             DateTime StartDate = DateTime.Today.AddDays(-6);
             DateTime EndDate = DateTime.Today;
 
-            List<Transaction> SelectedTransactions = await _context.Transactions.Include(x => x.Category).Where(y => y.Date >= StartDate && y.Date <= EndDate).ToListAsync();
-            //Total Income
-            decimal TotalIncome = SelectedTransactions
-                .Where(i => i.Category.Type == "Income")
-                .Sum(j => j.Amount);
-            ViewBag.TotalIncome = TotalIncome.ToString("C0");
+            List<Transaction> SelectedTransactions = await _context.Transactions.Include(x => x.Category).Where(y => y.Date >= StartDate && y.Date <= EndDate).Where(y => y.UserId.ToString() == currentUserId).ToListAsync();
+            
+            // Calculate total income and total expenses for the current user
+            decimal totalIncome = await _context.Transactions
+                .Where(t => t.UserId.ToString() == currentUserId && t.Category.Type == "Income")
+                .SumAsync(t => t.Amount);
 
-            //Total Expense
-            decimal TotalExpense = SelectedTransactions
-                .Where(i => i.Category.Type == "Expense")
-                .Sum(j => j.Amount);
-            ViewBag.TotalExpense = TotalExpense.ToString("C0");
+            decimal totalExpense = await _context.Transactions
+                .Where(t => t.UserId.ToString() == currentUserId && t.Category.Type == "Expense")
+                .SumAsync(t => t.Amount);
 
-            //Balance
-            decimal Balance = TotalIncome - TotalExpense;
-            CultureInfo culture = CultureInfo.CreateSpecificCulture("pl-PLN");
-            culture.NumberFormat.CurrencyNegativePattern = 1;
-            ViewBag.Balance = String.Format(culture, "{0:C0}", Balance);
+            ViewBag.TotalIncome = totalIncome.ToString("C0");
+            ViewBag.TotalExpense = totalExpense.ToString("C0");
+            ViewBag.Balance = (totalIncome - totalExpense).ToString("C0");
 
             //Spline Chart - Income vs Expense
 
             //Income
             List<SplineChartData> IncomeSummary = SelectedTransactions
+                .Where(x => x.UserId.ToString() == currentUserId)
                 .Where(i => i.Category.Type == "Income")
                 .GroupBy(j => j.Date)
                 .Select(k => new SplineChartData()
@@ -60,6 +59,7 @@ namespace HomeBudget.Controllers
 
             //Expense
             List<SplineChartData> ExpenseSummary = SelectedTransactions
+                .Where(x => x.UserId.ToString() == currentUserId)
                 .Where(i => i.Category.Type == "Expense")
                 .GroupBy(j => j.Date)
                 .Select(k => new SplineChartData()
@@ -86,11 +86,12 @@ namespace HomeBudget.Controllers
                                           expense = expense == null ? 0 : expense.expense,
                                       };
             //Recent Transactions
-            ViewBag.RecentTransactions = await _context.Transactions
-                .Include(i => i.Category)
-                .OrderByDescending(j => j.Date)
-                .Take(5)
-                .ToListAsync();
+        ViewBag.RecentTransactions = await _context.Transactions
+            .Include(i => i.Category)
+            .Where(t => t.UserId.ToString() == currentUserId)
+            .OrderByDescending(j => j.Date)
+            .Take(5)
+            .ToListAsync();
 
 
             return View();

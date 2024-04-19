@@ -24,7 +24,8 @@ namespace HomeBudget.Controllers
         // GET: Account
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Accounts.ToListAsync());
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            return View(await _context.Accounts.Where(x => x.UserId.ToString() == currentUserId).ToListAsync());
         }
 
         // GET: Account/Details/5
@@ -58,6 +59,8 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AccountId,AccountName,Note,Income,Expanse")] Account account)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            account.UserId = int.Parse(currentUserId);
             if (ModelState.IsValid)
             {
                 _context.Add(account);

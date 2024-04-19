@@ -1,7 +1,7 @@
-﻿@model IEnumerable<dynamic>
+﻿<h3>Chart</h3>
+<canvas id="myChart" width="400" height="200"></canvas>
 
-<h1>Dashboard</h1>
-
+<p></p>
 <!-- Total Income -->
 <p>(The beginning income is not taken)</p>
 <p>Total Income: @ViewBag.TotalIncome</p>
@@ -11,12 +11,6 @@
 
 <!-- Balance -->
 <p>Balance: @ViewBag.Balance</p>
-
-<!-- Spline Chart - Income vs Expense -->
-<h2>Spline Chart - Income vs Expense</h2>
-<div>
-    <canvas id="splineChart"></canvas>
-</div>
 
 <!-- Recent Transactions -->
 <h2>Recent Transactions</h2>
@@ -45,38 +39,36 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Spline Chart Data
-        var splineChartData = @Html.Raw(Json.Serialize(ViewBag.SplineChartData));
+        // Dane do wykresu
+        var chartData = @Html.Raw(Json.Serialize(ViewBag.ChartData));
 
-        // Create Spline Chart
-        var ctx = document.getElementById('splineChart').getContext('2d');
+        // Przetwarzanie danych do wykresu
+        var labels = chartData.map(item => item.label);
+        var incomeData = chartData.map(item => item.income);
+        var expenseData = chartData.map(item => item.expense);
+
+        // Utwórz wykres
+        var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: splineChartData.map(data => data.day),
+                labels: labels,
                 datasets: [{
                     label: 'Income',
-                    data: splineChartData.map(data => data.income),
-                    borderColor: 'green',
-                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
-                    fill: true
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    data: incomeData
                 }, {
                     label: 'Expense',
-                    data: splineChartData.map(data => data.expense),
-                    borderColor: 'red',
-                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                    fill: true
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    data: expenseData
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
                 scales: {
-                    xAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
                     yAxes: [{
                         ticks: {
                             beginAtZero: true

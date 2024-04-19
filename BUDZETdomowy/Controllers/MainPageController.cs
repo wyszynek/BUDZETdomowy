@@ -1,18 +1,18 @@
-﻿using HomeBudget.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using HomeBudget.Data;
+﻿using HomeBudget.Data;
+using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HomeBudget.Controllers
 {
     [Authorize]
     public class MainPageController : Controller
     {
-
         private readonly ApplicationDbContext _context;
 
         public MainPageController(ApplicationDbContext context)
@@ -20,16 +20,49 @@ namespace HomeBudget.Controllers
             _context = context;
         }
 
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
 
-            //Last 7 Days
-            DateTime StartDate = DateTime.Today.AddDays(-6);
-            DateTime EndDate = DateTime.Today;
+            // Pobierz datę początkową (7 dni wstecz)
+            DateTime startDate = DateTime.Today.AddDays(-6);
 
-            List<Transaction> SelectedTransactions = await _context.Transactions.Include(x => x.Category).Where(y => y.Date >= StartDate && y.Date <= EndDate).Where(y => y.UserId.ToString() == currentUserId).ToListAsync();
-            
+            // Pobierz dane transakcji dla ostatnich 7 dni
+            var transactionsData = await _context.Transactions
+                .Where(t => t.UserId.ToString() == currentUserId && t.Date >= startDate)
+                .GroupBy(t => t.Date.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Income = g.Where(t => t.Category.Type == "Income").Sum(t => t.Amount),
+                    Expense = g.Where(t => t.Category.Type == "Expense").Sum(t => t.Amount)
+                })
+                .OrderBy(g => g.Date)
+                .ToListAsync();
+
+            // Utwórz listę dni i uzupełnij brakujące dni w przypadku braku transakcji
+            List<DateTime> allDays = Enumerable.Range(0, 7).Select(i => startDate.AddDays(i)).ToList();
+            var chartData = allDays.Select(day => new
+            {
+                Date = day,
+                Income = transactionsData.FirstOrDefault(d => d.Date.Date == day)?.Income ?? 0,
+                Expense = transactionsData.FirstOrDefault(d => d.Date.Date == day)?.Expense ?? 0
+            });
+
+            ViewBag.ChartData = chartData.Select(d => new
+            {
+                Label = d.Date.ToString("dd-MMM"),
+                Income = d.Income,
+                Expense = d.Expense
+            });
+
+            ViewBag.RecentTransactions = await _context.Transactions
+                .Include(i => i.Category)
+                .Where(t => t.UserId.ToString() == currentUserId)
+                .OrderByDescending(j => j.Date)
+                .Take(5)
+                .ToListAsync();
+
             // Calculate total income and total expenses for the current user
             decimal totalIncome = await _context.Transactions
                 .Where(t => t.UserId.ToString() == currentUserId && t.Category.Type == "Income")
@@ -43,66 +76,7 @@ namespace HomeBudget.Controllers
             ViewBag.TotalExpense = totalExpense.ToString("C0");
             ViewBag.Balance = (totalIncome - totalExpense).ToString("C0");
 
-            //Spline Chart - Income vs Expense
-
-            //Income
-            List<SplineChartData> IncomeSummary = SelectedTransactions
-                .Where(x => x.UserId.ToString() == currentUserId)
-                .Where(i => i.Category.Type == "Income")
-                .GroupBy(j => j.Date)
-                .Select(k => new SplineChartData()
-                {
-                    day = k.First().Date.ToString("dd-MMM"),
-                    income = (int)k.Sum(l => l.Amount)
-                })
-                .ToList();
-
-            //Expense
-            List<SplineChartData> ExpenseSummary = SelectedTransactions
-                .Where(x => x.UserId.ToString() == currentUserId)
-                .Where(i => i.Category.Type == "Expense")
-                .GroupBy(j => j.Date)
-                .Select(k => new SplineChartData()
-                {
-                    day = k.First().Date.ToString("dd-MMM"),
-                    expense = (int)k.Sum(l => l.Amount)
-                })
-                .ToList();
-
-            //Combine Income & Expense
-            string[] Last7Days = Enumerable.Range(0, 7)
-                .Select(i => StartDate.AddDays(i).ToString("dd-MMM"))
-                .ToArray();
-
-            ViewBag.SplineChartData = from day in Last7Days
-                                      join income in IncomeSummary on day equals income.day into dayIncomeJoined
-                                      from income in dayIncomeJoined.DefaultIfEmpty()
-                                      join expense in ExpenseSummary on day equals expense.day into expenseJoined
-                                      from expense in expenseJoined.DefaultIfEmpty()
-                                      select new
-                                      {
-                                          day = day,
-                                          income = income == null ? 0 : income.income,
-                                          expense = expense == null ? 0 : expense.expense,
-                                      };
-            //Recent Transactions
-        ViewBag.RecentTransactions = await _context.Transactions
-            .Include(i => i.Category)
-            .Where(t => t.UserId.ToString() == currentUserId)
-            .OrderByDescending(j => j.Date)
-            .Take(5)
-            .ToListAsync();
-
-
             return View();
         }
-    }
-
-    public class SplineChartData
-    {
-        public string day;
-        public int income;
-        public int expense;
-
     }
 }

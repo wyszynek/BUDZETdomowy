@@ -63,7 +63,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,CreationTime,EndTime")] Budget budget)
+        public async Task<IActionResult> Create([Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,BudgetProgress,CreationTime,EndTime")] Budget budget)
         {
             var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
             budget.UserId = int.Parse(currentUserId);
@@ -75,7 +75,6 @@ namespace HomeBudget.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
             PopulateCategoriesAndAccounts();
             //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
             //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
@@ -104,7 +103,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,CreationTime,EndTime")] Budget budget)
+        public async Task<IActionResult> Edit(int id, [Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,BudgetProgress,CreationTime,EndTime")] Budget budget)
         {
             if (id != budget.Id)
             {

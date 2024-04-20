@@ -35,8 +35,9 @@ namespace HomeBudget.Models
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal Limit { get; set; }
 
-        //chyba potrzebna jeszcze zmienna ktora bedzie przetrzymywac sume wszystkich transakcji danej kategorii, 
-        //dzieki ktorej bedzie mozna latwiej obliczyc postep zakonczenia budzetu
+        [Column(TypeName = "decimal(18, 2)")]
+        [DisplayFormat(DataFormatString = "{0:C2}")]
+        public decimal BudgetProgress { get; set; }
 
         public DateTime CreationTime { get; set; } = DateTime.Now;
 
@@ -47,5 +48,10 @@ namespace HomeBudget.Models
 
         public int UserId { get; set; }
         public User? User { get; set; }
+
+        public Budget()
+        {
+            BudgetProgress = 0;
+        }
     }
 }

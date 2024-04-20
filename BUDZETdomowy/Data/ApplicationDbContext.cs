@@ -29,6 +29,12 @@ namespace HomeBudget.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Budget>()
+                .HasOne(b => b.Account)
+                .WithMany()
+                .HasForeignKey(b => b.AccountId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Budget>()
                 .HasOne(b => b.User)
                 .WithMany()
                 .HasForeignKey(b => b.UserId)

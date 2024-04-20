@@ -24,7 +24,8 @@ namespace HomeBudget.Controllers
         // GET: Budget
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Budgets.Include(b => b.Account).Include(b => b.Category);
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var applicationDbContext = _context.Budgets.Include(b => b.Account).Include(b => b.Category).Where(t => t.UserId.ToString() == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -64,12 +65,17 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,CreationTime,EndTime")] Budget budget)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            budget.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(budget);
+
             if (ModelState.IsValid)
             {
                 _context.Add(budget);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             PopulateCategoriesAndAccounts();
             //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
             //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
@@ -89,8 +95,7 @@ namespace HomeBudget.Controllers
             {
                 return NotFound();
             }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
+            PopulateCategoriesAndAccounts();
             return View(budget);
         }
 
@@ -126,8 +131,7 @@ namespace HomeBudget.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
+            PopulateCategoriesAndAccounts();
             return View(budget);
         }
 
@@ -174,15 +178,17 @@ namespace HomeBudget.Controllers
         [NonAction]
         public void PopulateCategoriesAndAccounts()
         {
-            var CategoryCollection = _context.Categories.ToList();
-            Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
-            CategoryCollection.Insert(0, DefaultCategory);
-            ViewBag.Categories = CategoryCollection;
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
 
-            var AccountsCollection = _context.Accounts.ToList();
+            var userCategories = _context.Categories.Where(c => c.UserId.ToString() == currentUserId).ToList();
+            Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
+            userCategories.Insert(0, DefaultCategory);
+            ViewBag.Categories = userCategories;
+
+            var userAccounts = _context.Accounts.Where(a => a.UserId.ToString() == currentUserId).ToList();
             Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
-            AccountsCollection.Insert(0, DefaultAccount);
-            ViewBag.Accounts = AccountsCollection;
+            userAccounts.Insert(0, DefaultAccount);
+            ViewBag.Accounts = userAccounts;
         }
     }
 }

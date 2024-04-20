@@ -140,6 +140,11 @@ namespace HomeBudget.Controllers
                     .Select(c => c.Type)
                     .FirstOrDefault();
 
+                var budget = _context.Budgets
+                    .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
+
+                var budgetEndDate = budget.EndTime;
+
                 if (targetAccount != null && categoryType != null)
                 {
                     if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
@@ -167,6 +172,11 @@ namespace HomeBudget.Controllers
                         targetAccount.Income -= transaction.Amount;
                         // Dodaj transakcję do kontekstu bazy danych
                         _context.Add(transaction);
+
+                        if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId && transaction.Date <= budgetEndDate)
+                        {
+                            budget.BudgetProgress += transaction.Amount;
+                        }
 
                         // Zapisz zmiany w bazie danych
                         await _context.SaveChangesAsync();
@@ -222,9 +232,15 @@ namespace HomeBudget.Controllers
                     var originalTransaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
                     var targetAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
                     var categoryType = _context.Categories
-                    .Where(c => c.Id == transaction.CategoryId)
-                    .Select(c => c.Type)
-                    .FirstOrDefault();
+                        .Where(c => c.Id == transaction.CategoryId)
+                        .Select(c => c.Type)
+                        .FirstOrDefault();
+
+                    var budget = _context.Budgets
+                        .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
+
+                    var budgetEndDate = budget.EndTime;
+
                     if (targetAccount != null && categoryType != null)
                     {
                         if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
@@ -252,6 +268,11 @@ namespace HomeBudget.Controllers
                             
                             targetAccount.Income -= transaction.Amount;
                             targetAccount.Expanse += transaction.Amount;
+
+                            if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId && transaction.Date <= budgetEndDate)
+                            {
+                                budget.BudgetProgress += transaction.Amount;
+                            }
 
                             await _context.SaveChangesAsync();
 
@@ -304,14 +325,17 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var transaction = await _context.Transactions
-            .Include(t => t.Account)
-            .Include(t => t.Category)
-            .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(t => t.Account)
+                .Include(t => t.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
             var targetAccount = transaction.Account;
             var categoryType = _context.Categories
-            .Where(c => c.Id == transaction.CategoryId)
-            .Select(c => c.Type)
-            .FirstOrDefault();
+                .Where(c => c.Id == transaction.CategoryId)
+                .Select(c => c.Type)
+                .FirstOrDefault();
+
+            var budget = _context.Budgets
+                .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
 
             if (transaction == null)
             {
@@ -326,6 +350,11 @@ namespace HomeBudget.Controllers
             {
                 targetAccount.Expanse -= transaction.Amount;
                 targetAccount.Income += transaction.Amount;
+
+                if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                {
+                    budget.BudgetProgress -= transaction.Amount;
+                }
             }
 
             try

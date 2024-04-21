@@ -171,7 +171,7 @@ namespace HomeBudget.Controllers
                         // Dodaj transakcję do kontekstu bazy danych
                         _context.Add(transaction);
 
-                        if (budget != null)
+                        if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
                         {
                             if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
                             {
@@ -268,7 +268,7 @@ namespace HomeBudget.Controllers
                             targetAccount.Income -= transaction.Amount;
                             targetAccount.Expanse += transaction.Amount;
 
-                            if (budget != null)
+                            if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
                             {
                                 if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
                                 {

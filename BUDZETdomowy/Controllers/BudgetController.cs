@@ -105,6 +105,10 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,BudgetProgress,CreationTime,EndTime")] Budget budget)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            budget.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(budget);
+
             if (id != budget.Id)
             {
                 return NotFound();

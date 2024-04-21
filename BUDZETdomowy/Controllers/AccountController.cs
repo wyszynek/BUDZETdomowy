@@ -61,6 +61,8 @@ namespace HomeBudget.Controllers
         {
             var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
             account.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(account);
+
             if (ModelState.IsValid)
             {
                 _context.Add(account);
@@ -93,6 +95,10 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AccountId,AccountName,Note,Income,Expanse")] Account account)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            account.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(account);
+
             if (id != account.Id)
             {
                 return NotFound();

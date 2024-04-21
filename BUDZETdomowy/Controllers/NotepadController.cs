@@ -100,6 +100,10 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("NoteID,Date,Title,Description")] Notepad notepad)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            notepad.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(notepad);
+
             if (id != notepad.Id)
             {
                 return NotFound();

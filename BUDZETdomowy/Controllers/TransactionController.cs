@@ -221,6 +221,11 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            transaction.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(transaction);
+            PopulateCategoriesAndAccounts();
+
             if (id != transaction.Id)
             {
                 return NotFound();
@@ -232,6 +237,7 @@ namespace HomeBudget.Controllers
                 {
                     var originalTransaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
                     var targetAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
+                    
                     var categoryType = _context.Categories
                         .Where(c => c.Id == transaction.CategoryId)
                         .Select(c => c.Type)
@@ -252,8 +258,8 @@ namespace HomeBudget.Controllers
                         if (categoryType == "Income")
                         {
                             targetAccount.Income -= originalTransaction.Amount;
-                            _context.Update(transaction);
                             targetAccount.Income += transaction.Amount;
+                            _context.Update(transaction);
 
                             await _context.SaveChangesAsync();
 
@@ -263,10 +269,10 @@ namespace HomeBudget.Controllers
                         {
                             targetAccount.Expanse -= originalTransaction.Amount;
                             targetAccount.Income += originalTransaction.Amount;
-                            _context.Update(transaction);
-                            
+
                             targetAccount.Income -= transaction.Amount;
                             targetAccount.Expanse += transaction.Amount;
+                            budget.BudgetProgress -= originalTransaction.Amount;
 
                             if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
                             {
@@ -275,6 +281,8 @@ namespace HomeBudget.Controllers
                                     budget.BudgetProgress += transaction.Amount;
                                 }
                             }
+
+                            _context.Update(transaction);
 
                             await _context.SaveChangesAsync();
 
@@ -297,7 +305,7 @@ namespace HomeBudget.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            PopulateCategoriesAndAccounts();
+
             return View(transaction);
         }
 

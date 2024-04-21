@@ -183,6 +183,10 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date")] TransactionBetweenAccounts transactionBetweenAccounts)
         {
+            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            transactionBetweenAccounts.UserId = int.Parse(currentUserId);
+            await TryUpdateModelAsync(transactionBetweenAccounts);
+
             if (id != transactionBetweenAccounts.Id)
             {
                 return NotFound();

@@ -1,10 +1,14 @@
-﻿namespace HomeBudget.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HomeBudget.Models
 {
     public class Currency
     {
-        public int CurrencyId { get; set; }
-        public string CurrencySymbol { get; set; }
-        public string CurrencyString { get; set; }
-        public string Display => CurrencyString + " (" + CurrencySymbol + ")";
+        [Key]
+        public int Id { get; set; }
+
+        [Column(TypeName = "nvarchar(3)")]
+        public string Code { get; set; }
     }
 }

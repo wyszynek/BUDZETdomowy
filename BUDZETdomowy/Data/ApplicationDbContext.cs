@@ -51,6 +51,24 @@ namespace HomeBudget.Data
                 .WithMany()
                 .HasForeignKey(t => t.CategoryId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Currency)
+                .WithMany()
+                .HasForeignKey(t => t.CurrencyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Account>()
+                .HasOne(t => t.Currency)
+                .WithMany()
+                .HasForeignKey(t => t.CurrencyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Account>()
+                .HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
         public DbSet<Transaction> Transactions { get; set; }
@@ -60,5 +78,6 @@ namespace HomeBudget.Data
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<Notepad> Notepad { get; set; }
         public DbSet<TransactionBetweenAccounts> TransactionBetweenAccounts { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
     }
 }

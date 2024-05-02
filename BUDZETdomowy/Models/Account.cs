@@ -16,11 +16,11 @@ namespace HomeBudget.Models
         public string? Note { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        [DisplayFormat(DataFormatString = "{0:C2}")]
+        [DisplayFormat(DataFormatString = "{0:F2}")]
         public decimal Income { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        [DisplayFormat(DataFormatString = "{0:C2}")]
+        [DisplayFormat(DataFormatString = "{0:F2}")]
         public decimal Expanse { get; set; }
 
         public decimal Balance => Income - Expanse;
@@ -29,6 +29,9 @@ namespace HomeBudget.Models
         {
             Expanse = 0;
         }
+
+        public int CurrencyId { get; set; }
+        public Currency? Currency { get; set; }
 
         public int UserId { get; set; }
         public User? User { get; set; }

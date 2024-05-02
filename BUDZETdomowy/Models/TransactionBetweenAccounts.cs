@@ -18,7 +18,7 @@ namespace HomeBudget.Models
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount should be greater than 0.")]
         [Column(TypeName = "decimal(18, 2)")]
-        [DisplayFormat(DataFormatString = "{0:C2}")]
+        [DisplayFormat(DataFormatString = "{0:F2}")]
         public decimal Amount { get; set; }
 
         [Column(TypeName = "nvarchar(75)")]

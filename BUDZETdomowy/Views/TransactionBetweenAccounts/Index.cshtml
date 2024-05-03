@@ -36,6 +36,9 @@
                 @Html.DisplayNameFor(model => model.Amount)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.SenderAccount.Currency)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Note)
             </th>
             <th>
@@ -55,6 +58,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SenderAccount.Currency.Code)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Note)

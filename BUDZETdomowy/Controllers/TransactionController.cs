@@ -26,18 +26,18 @@ namespace HomeBudget.Controllers
         // GET: Transaction
         public async Task<IActionResult> Index()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Category).Where(t => t.UserId.ToString() == currentUserId);
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Account.Currency).Include(t => t.Category).Where(t => t.UserId == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
         public IActionResult ExportToCSV()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
             var transactions = _context.Transactions
                 .Include(t => t.Category)
                 .Include(t => t.Account)
-                .Where(t => t.UserId.ToString() == currentUserId)
+                .Where(t => t.UserId == currentUserId)
                 .ToList();
 
             var builder = new StringBuilder();
@@ -55,11 +55,11 @@ namespace HomeBudget.Controllers
 
         public IActionResult ExportToExcel()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
             var transactions = _context.Transactions
                 .Include(t => t.Category)
                 .Include(t => t.Account)
-                .Where(t => t.UserId.ToString() == currentUserId)
+                .Where(t => t.UserId == currentUserId)
                 .ToList();
 
             using (var workbook = new XLWorkbook())
@@ -127,8 +127,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            transaction.UserId = int.Parse(currentUserId);
+            transaction.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transaction);
 
             if (ModelState.IsValid)
@@ -221,8 +220,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            transaction.UserId = int.Parse(currentUserId);
+            transaction.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transaction);
             PopulateCategoriesAndAccounts();
 
@@ -394,17 +392,22 @@ namespace HomeBudget.Controllers
 
         public void PopulateCategoriesAndAccounts()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
-            var userCategories = _context.Categories.Where(c => c.UserId.ToString() == currentUserId).ToList();
+            var userCategories = _context.Categories.Where(c => c.UserId == currentUserId).ToList();
             Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
             userCategories.Insert(0, DefaultCategory);
             ViewBag.Categories = userCategories;
 
-            var userAccounts = _context.Accounts.Where(a => a.UserId.ToString() == currentUserId).ToList();
+            var userAccounts = _context.Accounts.Where(a => a.UserId == currentUserId).ToList();
             Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
             userAccounts.Insert(0, DefaultAccount);
             ViewBag.Accounts = userAccounts;
+
+            var CurrencyCollection = _context.Currencies.ToList();
+            Currency DefaultCurrency = new Currency() { Id = 0, Code = "Choose a Currency" };
+            CurrencyCollection.Insert(0, DefaultCurrency);
+            ViewBag.Currencies = CurrencyCollection;
         }
     }
 }

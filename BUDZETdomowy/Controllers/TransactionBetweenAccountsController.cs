@@ -25,9 +25,16 @@ namespace HomeBudget.Controllers
         }
         public IActionResult ExportToCSV()
         {
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            var transactionBetweenAccounts = _context.TransactionBetweenAccounts
+                .Include(t => t.SenderAccount)
+                .Include(t => t.RecipientAccount)
+                .Where(t => t.UserId == currentUserId)
+                .ToList();
+
             var builder = new StringBuilder();
             builder.AppendLine("Sender, Recipient, Amount, Date");
-            foreach (var TBA in _context.TransactionBetweenAccounts.Include(t => t.SenderAccount).Include(t => t.RecipientAccount))
+            foreach (var TBA in transactionBetweenAccounts)
             {
                 string senderName = TBA.SenderAccount?.AccountName ?? "Unknown";
                 string recipientName = TBA.RecipientAccount?.AccountName ?? "Unknown";
@@ -39,11 +46,11 @@ namespace HomeBudget.Controllers
 
         public IActionResult ExportToExcel()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
             var transactionBetweenAccounts = _context.TransactionBetweenAccounts
                 .Include(t => t.SenderAccount)
                 .Include(t => t.RecipientAccount)
-                .Where(t => t.UserId.ToString() == currentUserId)
+                .Where(t => t.UserId == currentUserId)
                 .ToList();
 
             using (var workbook = new XLWorkbook())
@@ -77,8 +84,8 @@ namespace HomeBudget.Controllers
         // GET: TransactionBetweenAccounts
         public async Task<IActionResult> Index()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            var applicationDbContext = _context.TransactionBetweenAccounts.Include(t => t.RecipientAccount).Include(t => t.SenderAccount).Where(t => t.UserId.ToString() == currentUserId);
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            var applicationDbContext = _context.TransactionBetweenAccounts.Include(t => t.RecipientAccount).Include(t => t.SenderAccount).Include(t => t.SenderAccount.Currency).Where(t => t.UserId == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -118,8 +125,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date")] TransactionBetweenAccounts transactionBetweenAccounts)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            transactionBetweenAccounts.UserId = int.Parse(currentUserId);
+            transactionBetweenAccounts.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transactionBetweenAccounts);
 
             if (ModelState.IsValid)
@@ -183,8 +189,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date")] TransactionBetweenAccounts transactionBetweenAccounts)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            transactionBetweenAccounts.UserId = int.Parse(currentUserId);
+            transactionBetweenAccounts.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transactionBetweenAccounts);
 
             if (id != transactionBetweenAccounts.Id)
@@ -318,12 +323,17 @@ namespace HomeBudget.Controllers
 
         public void PopulateAccount()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
-            var userAccounts = _context.Accounts.Where(a => a.UserId.ToString() == currentUserId).ToList();
+            var userAccounts = _context.Accounts.Where(a => a.UserId == currentUserId).ToList();
             Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
             userAccounts.Insert(0, DefaultAccount);
             ViewBag.Accounts = userAccounts;
+
+            var CurrencyCollection = _context.Currencies.ToList();
+            Currency DefaultCurrency = new Currency() { Id = 0, Code = "Choose a Currency" };
+            CurrencyCollection.Insert(0, DefaultCurrency);
+            ViewBag.Currencies = CurrencyCollection;
         }
     }
 }

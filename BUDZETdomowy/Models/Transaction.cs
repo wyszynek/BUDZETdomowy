@@ -26,9 +26,6 @@ namespace HomeBudget.Models
         
         public DateTime Date { get; set; } = DateTime.Now;
 
-        public int CurrencyId { get; set; }
-        public Currency? Currency { get; set; }
-
         public int UserId { get; set; }
         public User? User { get; set; }
     }

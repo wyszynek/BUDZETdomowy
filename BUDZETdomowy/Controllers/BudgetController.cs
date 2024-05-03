@@ -24,8 +24,8 @@ namespace HomeBudget.Controllers
         // GET: Budget
         public async Task<IActionResult> Index()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            var applicationDbContext = _context.Budgets.Include(b => b.Account).Include(b => b.Category).Where(t => t.UserId.ToString() == currentUserId);
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            var applicationDbContext = _context.Budgets.Include(b => b.Account).Include(b => b.Category).Where(t => t.UserId == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -65,8 +65,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,BudgetProgress,CreationTime,EndTime")] Budget budget)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            budget.UserId = int.Parse(currentUserId);
+            budget.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(budget);
 
             if (ModelState.IsValid)
@@ -105,8 +104,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BudgetId,BudgetName,CategoryId,AccountId,Limit,BudgetProgress,CreationTime,EndTime")] Budget budget)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            budget.UserId = int.Parse(currentUserId);
+            budget.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(budget);
 
             if (id != budget.Id)
@@ -181,14 +179,14 @@ namespace HomeBudget.Controllers
         [NonAction]
         public void PopulateCategoriesAndAccounts()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
-            var userCategories = _context.Categories.Where(c => c.UserId.ToString() == currentUserId).ToList();
+            var userCategories = _context.Categories.Where(c => c.UserId == currentUserId).ToList();
             Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
             userCategories.Insert(0, DefaultCategory);
             ViewBag.Categories = userCategories;
 
-            var userAccounts = _context.Accounts.Where(a => a.UserId.ToString() == currentUserId).ToList();
+            var userAccounts = _context.Accounts.Where(a => a.UserId == currentUserId).ToList();
             Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
             userAccounts.Insert(0, DefaultAccount);
             ViewBag.Accounts = userAccounts;

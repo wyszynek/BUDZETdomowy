@@ -24,8 +24,8 @@ namespace HomeBudget.Controllers
         // GET: Notepad
         public async Task<IActionResult> Index()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            return View(await _context.Notepad.Where(x => x.UserId.ToString() == currentUserId).ToListAsync());
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            return View(await _context.Notepad.Where(x => x.UserId == currentUserId).ToListAsync());
         }
 
         // GET: Notepad/Details/5
@@ -65,8 +65,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("NoteID,Date,Title,Description")] Notepad notepad)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            notepad.UserId = int.Parse(currentUserId);
+            notepad.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(notepad);
             if (ModelState.IsValid)
             {
@@ -100,8 +99,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("NoteID,Date,Title,Description")] Notepad notepad)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            notepad.UserId = int.Parse(currentUserId);
+            notepad.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(notepad);
 
             if (id != notepad.Id)

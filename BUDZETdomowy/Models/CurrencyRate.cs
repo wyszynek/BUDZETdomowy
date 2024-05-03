@@ -46,5 +46,44 @@ namespace HomeBudget.Models
                 return null;
             }
         }
+
+        public static async Task<decimal> Calculate(decimal amount, string sourceCurrencyCode, string targetCurrencyCode)
+        {
+            var currencyRates = await GetCurrencyRates();
+            
+            decimal sourceCurrencyRate;
+            if (sourceCurrencyCode == "PLN")
+            {
+                sourceCurrencyRate = 1;
+            }
+            else
+            {
+                var sourceCurrency = currencyRates.FirstOrDefault(x => x.Code == sourceCurrencyCode);
+                if (sourceCurrency is null)
+                {
+                    throw new Exception($"Source currency {sourceCurrencyCode} not found");
+                }
+
+                sourceCurrencyRate = sourceCurrency.Rate;
+            }
+
+            decimal targetCurrencyRate;
+            if (targetCurrencyCode == "PLN")
+            {
+                targetCurrencyRate = 1;
+            }
+            else
+            {
+                var targetCurrency = currencyRates.FirstOrDefault(x => x.Code == targetCurrencyCode);
+                if (targetCurrency is null)
+                {
+                    throw new Exception($"Target currency {targetCurrencyCode} not found");
+                }
+
+                targetCurrencyRate = targetCurrency.Rate;
+            }
+
+            return amount * sourceCurrencyRate / targetCurrencyRate;
+        }
     }
 }

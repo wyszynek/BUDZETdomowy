@@ -17,9 +17,9 @@
                 <select asp-for="SenderId" class="form-control">
                     @foreach (var senderAccount in ViewBag.Accounts)
                     {
-                        if (senderAccount.Id != 0) // Sprawdzenie, czy kategoria nie jest domyślna
+                        if (senderAccount.Id != 0) 
                         {
-                            string accountInfo = $"{senderAccount.AccountName} - {senderAccount.Income}";
+                            string accountInfo = $"{senderAccount.AccountName} - {senderAccount.Income} {senderAccount.Currency.Code}";
                             <option value="@senderAccount.Id">@accountInfo</option>
                         }
                         else
@@ -37,7 +37,7 @@
                     {
                         if (recipientAccount.Id != 0)
                         {
-                            string accountInfo = $"{recipientAccount.AccountName} - {recipientAccount.Income}";
+                            string accountInfo = $"{recipientAccount.AccountName} - {recipientAccount.Income} {recipientAccount.Currency.Code}";
                             <option value="@recipientAccount.Id">@accountInfo</option>
                         }
                         else

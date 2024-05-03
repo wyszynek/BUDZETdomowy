@@ -22,14 +22,14 @@ namespace HomeBudget.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
             // Pobierz datę początkową (7 dni wstecz)
             DateTime startDate = DateTime.Today.AddDays(-6);
 
             // Pobierz dane transakcji dla ostatnich 7 dni
             var transactionsData = await _context.Transactions
-                .Where(t => t.UserId.ToString() == currentUserId && t.Date >= startDate)
+                .Where(t => t.UserId == currentUserId && t.Date >= startDate)
                 .GroupBy(t => t.Date.Date)
                 .Select(g => new
                 {
@@ -58,18 +58,18 @@ namespace HomeBudget.Controllers
 
             ViewBag.RecentTransactions = await _context.Transactions
                 .Include(i => i.Category)
-                .Where(t => t.UserId.ToString() == currentUserId)
+                .Where(t => t.UserId == currentUserId)
                 .OrderByDescending(j => j.Date)
                 .Take(5)
                 .ToListAsync();
 
             // Calculate total income and total expenses for the current user
             decimal totalIncome = await _context.Transactions
-                .Where(t => t.UserId.ToString() == currentUserId && t.Category.Type == "Income")
+                .Where(t => t.UserId == currentUserId && t.Category.Type == "Income")
                 .SumAsync(t => t.Amount);
 
             decimal totalExpense = await _context.Transactions
-                .Where(t => t.UserId.ToString() == currentUserId && t.Category.Type == "Expense")
+                .Where(t => t.UserId == currentUserId && t.Category.Type == "Expense")
                 .SumAsync(t => t.Amount);
 
             ViewBag.TotalIncome = totalIncome.ToString("C0");

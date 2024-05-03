@@ -25,8 +25,8 @@ namespace HomeBudget.Controllers
         // GET: Category
         public async Task<IActionResult> Index()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            return View(await _context.Categories.Where(x => x.UserId.ToString() == currentUserId).ToListAsync());
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            return View(await _context.Categories.Where(x => x.UserId == currentUserId).ToListAsync());
         }
 
         // GET: Category/Details/5
@@ -60,8 +60,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CategoryId,CategoryName,Icon,Type")] Category category)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            category.UserId = int.Parse(currentUserId);
+            category.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(category);
 
             if (ModelState.IsValid)
@@ -96,8 +95,7 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("CategoryId,CategoryName,Icon,Type")] Category category)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            category.UserId = int.Parse(currentUserId);
+            category.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(category);
 
             if (id != category.Id)

@@ -53,9 +53,9 @@ namespace HomeBudget.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Currency)
+                .HasOne(t => t.Account)
                 .WithMany()
-                .HasForeignKey(t => t.CurrencyId)
+                .HasForeignKey(t => t.AccountId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Account>()

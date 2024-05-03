@@ -24,8 +24,9 @@ namespace HomeBudget.Controllers
         // GET: Account
         public async Task<IActionResult> Index()
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            return View(await _context.Accounts.Where(x => x.UserId.ToString() == currentUserId).ToListAsync());
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            return View(await _context.Accounts.Include(a => a.Currency).Where(x => x.UserId == currentUserId).ToListAsync());
+
         }
 
         // GET: Account/Details/5
@@ -49,6 +50,7 @@ namespace HomeBudget.Controllers
         // GET: Account/Create
         public IActionResult Create()
         {
+            PopulateCurrency();
             return View();
         }
 
@@ -57,10 +59,10 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AccountId,AccountName,Note,Income,Expanse")] Account account)
+        public async Task<IActionResult> Create([Bind("AccountId,AccountName,Note,Income,Expanse,CurrencyId")] Account account)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            account.UserId = int.Parse(currentUserId);
+            account.UserId = UserHelper.GetCurrentUserId(HttpContext);
+
             await TryUpdateModelAsync(account);
 
             if (ModelState.IsValid)
@@ -69,6 +71,7 @@ namespace HomeBudget.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            PopulateCurrency();
             return View(account);
         }
 
@@ -85,6 +88,7 @@ namespace HomeBudget.Controllers
             {
                 return NotFound();
             }
+            PopulateCurrency();
             return View(account);
         }
 
@@ -93,10 +97,9 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AccountId,AccountName,Note,Income,Expanse")] Account account)
+        public async Task<IActionResult> Edit(int id, [Bind("AccountId,AccountName,Note,Income,Expanse,CurrencyId")] Account account)
         {
-            var currentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            account.UserId = int.Parse(currentUserId);
+            account.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(account);
 
             if (id != account.Id)
@@ -108,8 +111,22 @@ namespace HomeBudget.Controllers
             {
                 try
                 {
-                    _context.Update(account);
-                    await _context.SaveChangesAsync();
+                    var previousAccount = await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    if (previousAccount != null)
+                    {
+                        var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == previousAccount.CurrencyId);
+                        var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == account.CurrencyId);
+
+                        account.Income = await CurrencyRateHelper.Calculate(account.Income, sourceCurrency.Code, targetCurrency.Code);
+                        account.Expanse = await CurrencyRateHelper.Calculate(account.Expanse, sourceCurrency.Code, targetCurrency.Code);
+
+                        _context.Update(account);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Insufficient funds in the sender's account after editing.");
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -124,6 +141,8 @@ namespace HomeBudget.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateCurrency();
             return View(account);
         }
 
@@ -163,6 +182,14 @@ namespace HomeBudget.Controllers
         private bool AccountExists(int id)
         {
             return _context.Accounts.Any(e => e.Id == id);
+        }
+
+        public void PopulateCurrency()
+        {
+            var CurrencyCollection = _context.Currencies.ToList();
+            Currency DefaultCurrency = new Currency() { Id = 0, Code = "Choose a Currency" };
+            CurrencyCollection.Insert(0, DefaultCurrency);
+            ViewBag.Currencies = CurrencyCollection;
         }
     }
 }

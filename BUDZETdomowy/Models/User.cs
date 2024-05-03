@@ -32,6 +32,17 @@ namespace HomeBudget.Models
 
     public class UserHelper
     {
+        public static int GetCurrentUserId(HttpContext context)
+        {
+            var id = context.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            if (id is null)
+            {
+                throw new Exception("No current user");
+            }
+
+            return int.Parse(id);
+        }
+
         public static string HashSHA256(string password)
         {
             StringBuilder sb = new StringBuilder();

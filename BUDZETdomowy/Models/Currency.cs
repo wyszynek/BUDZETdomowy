@@ -8,7 +8,7 @@ namespace HomeBudget.Models
         [Key]
         public int Id { get; set; }
 
-        [Column(TypeName = "nvarchar(3)")]
+        [Column(TypeName = "nvarchar(10)")]
         public string Code { get; set; }
     }
 }

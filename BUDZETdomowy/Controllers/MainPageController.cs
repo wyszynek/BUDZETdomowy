@@ -72,9 +72,9 @@ namespace HomeBudget.Controllers
                 .Where(t => t.UserId == currentUserId && t.Category.Type == "Expense")
                 .SumAsync(t => t.Amount);
 
-            ViewBag.TotalIncome = totalIncome.ToString("C0");
-            ViewBag.TotalExpense = totalExpense.ToString("C0");
-            ViewBag.Balance = (totalIncome - totalExpense).ToString("C0");
+            ViewBag.TotalIncome = totalIncome.ToString("F2");
+            ViewBag.TotalExpense = totalExpense.ToString("F2");
+            ViewBag.Balance = (totalIncome - totalExpense).ToString("F2");
 
             return View();
         }

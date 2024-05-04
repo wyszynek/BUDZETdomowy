@@ -137,9 +137,13 @@ namespace HomeBudget.Controllers
                 {
                     if (senderAccount.Income >= transactionBetweenAccounts.Amount)
                     {
-                        senderAccount.Expanse += transactionBetweenAccounts.Amount;
-                        recipientAccount.Income += transactionBetweenAccounts.Amount;
+                        var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
+                        var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
 
+                        var currencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, sourceCurrency.Code, targetCurrency.Code);
+
+                        senderAccount.Expanse += transactionBetweenAccounts.Amount;
+                        recipientAccount.Income += currencyExchange;
                         senderAccount.Income -= transactionBetweenAccounts.Amount;
 
                         _context.Add(transactionBetweenAccounts);
@@ -203,36 +207,50 @@ namespace HomeBudget.Controllers
                 {
                     var originalTransaction = await _context.TransactionBetweenAccounts.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
 
-                    var senderAccount = await _context.Accounts.FindAsync(originalTransaction.SenderId);
-                    var recipientAccount = await _context.Accounts.FindAsync(originalTransaction.RecipientId);
+                    var originalSenderAccount = await _context.Accounts.FindAsync(originalTransaction.SenderId);
+                    var originalRecipientAccount = await _context.Accounts.FindAsync(originalTransaction.RecipientId);
+                    var originalSourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalSenderAccount.CurrencyId);
+                    var originalTargetCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalRecipientAccount.CurrencyId);
 
-                    if (senderAccount != null && recipientAccount != null && senderAccount != recipientAccount)
+
+                    if (originalSenderAccount != null && originalRecipientAccount != null && originalSenderAccount != originalRecipientAccount)
                     {
-                        senderAccount.Income += originalTransaction.Amount;
-                        recipientAccount.Income -= originalTransaction.Amount;
-                        senderAccount.Expanse -= originalTransaction.Amount;
+                        var OriginalCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalSourceCurrency.Code, originalTargetCurrency.Code);
 
-                        if (senderAccount.Income >= transactionBetweenAccounts.Amount)
+                        originalSenderAccount.Income += originalTransaction.Amount;
+                        originalRecipientAccount.Income -= OriginalCurrencyExchange;
+                        originalSenderAccount.Expanse -= originalTransaction.Amount;
+
+                        var senderAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.SenderId);
+                        var recipientAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.RecipientId);
+
+                        if (senderAccount != null && recipientAccount != null && senderAccount != recipientAccount)
                         {
-                            _context.Update(transactionBetweenAccounts);
+                            if (senderAccount.Income >= transactionBetweenAccounts.Amount)
+                            {
+                                var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
+                                var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
 
-                            senderAccount.Expanse += transactionBetweenAccounts.Amount;
-                            recipientAccount.Income += transactionBetweenAccounts.Amount;
+                                var currencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, sourceCurrency.Code, targetCurrency.Code);
 
-                            senderAccount.Income -= transactionBetweenAccounts.Amount;
+                                senderAccount.Expanse += transactionBetweenAccounts.Amount;
+                                recipientAccount.Income += currencyExchange;
 
-                            await _context.SaveChangesAsync();
-
-                            return RedirectToAction(nameof(Index));
+                                senderAccount.Income -= transactionBetweenAccounts.Amount;
+                                _context.Update(transactionBetweenAccounts);
+                                await _context.SaveChangesAsync();
+                                return RedirectToAction(nameof(Index));
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "Insufficient funds in the sender's account after editing.");
+                            }
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "Insufficient funds in the sender's account after editing.");
+                            ModelState.AddModelError(string.Empty, "Same account detected.");
                         }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Same account detected.");
+
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -291,9 +309,14 @@ namespace HomeBudget.Controllers
             var senderAccount = transactionBetweenAccounts.SenderAccount;
             var recipientAccount = transactionBetweenAccounts.RecipientAccount;
 
+            var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
+            var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
+            var currencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, sourceCurrency.Code, targetCurrency.Code);
+
+
             senderAccount.Income += transactionBetweenAccounts.Amount;
             senderAccount.Expanse -= transactionBetweenAccounts.Amount;
-            recipientAccount.Income -= transactionBetweenAccounts.Amount;
+            recipientAccount.Income -= currencyExchange;
 
             try
             {

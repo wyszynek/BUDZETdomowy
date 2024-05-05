@@ -6,7 +6,7 @@
 
 <h1>Edit</h1>
 
-<h4>Receipt2</h4>
+<h4>Receipt</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -19,13 +19,13 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ContentType" class="control-label"></label>
-                <input asp-for="ContentType" class="form-control" />
-                <span asp-validation-for="ContentType" class="text-danger"></span>
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Data" class="control-label"></label>
-                <input asp-for="Data" class="form-control" />
+                <label asp-for="Data" class="control-label">Upload Image</label>
+                <input type="file" name="imageFile" class="form-control" />
                 <span asp-validation-for="Data" class="text-danger"></span>
             </div>
             <div class="form-group">

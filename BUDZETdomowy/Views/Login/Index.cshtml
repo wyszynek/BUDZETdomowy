@@ -1,39 +1,87 @@
-﻿@model HomeBudget.Models.Login
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Stylizacja całej strony */
+        body {
+            font-family: Arial, sans-serif; /* Ustawienie czcionki */
+            margin: 0; /* Usunięcie marginesu */
+            padding: 0; /* Usunięcie wypełnienia */
+            background-color: #f4f4f4; /* Kolor tła */
+        }
 
-@{
-    ViewBag.Title = "Login";
-}
+        /* Stylizacja formularza logowania */
+        form {
+            margin: 0 auto; /* Wyśrodkowanie formularza na stronie */
+            max-width: 400px; /* Maksymalna szerokość formularza */
+            padding: 20px; /* Dodanie wypełnienia dla formularza */
+            background-color: #fff; /* Kolor tła formularza */
+            border-radius: 5px; /* Zaokrąglenie rogów */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Dodanie cienia */
+        }
 
-<h2>Login</h2>
+        /* Stylizacja etykiet */
+        label {
+            font-size: 16px; /* Powiększenie czcionki */
+            display: block; /* Wyrównanie etykiet jeden pod drugim */
+            margin-bottom: 10px; /* Odstęp między etykietami */
+        }
 
-@using (Html.BeginForm())
-{
-    @Html.ValidationSummary(true)
+        /* Stylizacja pól tekstowych */
+        input[type="text"], input[type="password"] {
+            font-size: 16px; /* Powiększenie czcionki */
+            padding: 8px; /* Dodanie wypełnienia dla pól tekstowych */
+            width: 100%; /* Szerokość równa szerokości rodzica */
+            box-sizing: border-box; /* Włączenie box-sizing */
+            margin-bottom: 10px; /* Odstęp między polami */
+        }
 
-    <div>
-        @Html.LabelFor(model => model.UserName)
-        @Html.TextBoxFor(model => model.UserName)
-        @Html.ValidationMessageFor(model => model.UserName)
-    </div>
-        
-    <p></p>
+        /* Stylizacja przycisku */
+        button[type="submit"] {
+            font-size: 16px; /* Powiększenie czcionki */
+            padding: 10px 20px; /* Dodanie wypełnienia dla przycisku */
+            background-color: #007bff; /* Kolor tła przycisku */
+            color: #fff; /* Kolor tekstu */
+            border: none; /* Usunięcie obramowania */
+            cursor: pointer; /* Zmiana kursora na wskaźnik */
+            transition: background-color 0.3s ease; /* Animacja zmiany koloru tła */
+        }
 
-    <div>
-        @Html.LabelFor(model => model.Password)
-        @Html.PasswordFor(model => model.Password)
-        @Html.ValidationMessageFor(model => model.Password)
-    </div>
+            button[type="submit"]:hover {
+                background-color: #0056b3; /* Kolor tła przycisku po najechaniu */
+            }
 
-    <p></p>
-    <label>
-        <input type="checkbox" asp-for="KeepLoggedIn"></input>
-        Keep me logged in
-    </label>
-    <p></p>
+        /* Stylizacja linku do rejestracji */
+        p a {
+            color: #007bff; /* Kolor linku */
+        }
 
-    <button type="submit">Login</button>
+        /* Wyśrodkowanie tytułu */
+        header h1, title {
+            text-align: center;
+        }
+    </style>
+    <title>Home Budget - Login</title>
+</head>
+<body>
+    <header>
+        <h1>Home Budget</h1>
+    </header>
 
-    <p></p>
+    <form action="/login" method="post">
+        <h2 style="text-align: center;">Login</h2>
 
-    <p>Or you can register by clicking <a href="/User/Create">here</a></p>
-}
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username">
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password">
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p style="text-align: center;">Or you can register by clicking <a href="/User/Create">here</a></p>
+</body>
+</html>

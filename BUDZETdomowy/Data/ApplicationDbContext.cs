@@ -79,5 +79,6 @@ namespace HomeBudget.Data
         public DbSet<Notepad> Notepad { get; set; }
         public DbSet<TransactionBetweenAccounts> TransactionBetweenAccounts { get; set; }
         public DbSet<Currency> Currencies { get; set; }
+        public DbSet<Receipt2> Receipts2 { get; set; }
     }
 }

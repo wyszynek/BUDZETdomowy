@@ -85,7 +85,7 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
-            var applicationDbContext = _context.TransactionBetweenAccounts.Include(t => t.RecipientAccount).Include(t => t.SenderAccount).Include(t => t.SenderAccount.Currency).Where(t => t.UserId == currentUserId);
+            var applicationDbContext = _context.TransactionBetweenAccounts.Include(t => t.RecipientAccount).Include(t => t.SenderAccount).Include(t => t.Currency).Where(t => t.UserId == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -123,7 +123,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date")] TransactionBetweenAccounts transactionBetweenAccounts)
+        public async Task<IActionResult> Create([Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date,CurrencyId")] TransactionBetweenAccounts transactionBetweenAccounts)
         {
             transactionBetweenAccounts.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transactionBetweenAccounts);
@@ -135,16 +135,18 @@ namespace HomeBudget.Controllers
 
                 if (senderAccount != null && recipientAccount != null && senderAccount != recipientAccount)
                 {
-                    if (senderAccount.Income >= transactionBetweenAccounts.Amount)
+                    var senderCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
+                    var recipientCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
+                    var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transactionBetweenAccounts.CurrencyId);
+
+                    var senderCurrencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, transactionCurrency.Code, senderCurrency.Code);
+                    var recipientCurrencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, transactionCurrency.Code, recipientCurrency.Code);
+
+                    if (senderAccount.Income >= senderCurrencyExchange)
                     {
-                        var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
-                        var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
-
-                        var currencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, sourceCurrency.Code, targetCurrency.Code);
-
-                        senderAccount.Expanse += transactionBetweenAccounts.Amount;
-                        recipientAccount.Income += currencyExchange;
-                        senderAccount.Income -= transactionBetweenAccounts.Amount;
+                        senderAccount.Expanse += senderCurrencyExchange;
+                        recipientAccount.Income += recipientCurrencyExchange;
+                        senderAccount.Income -= senderCurrencyExchange;
 
                         _context.Add(transactionBetweenAccounts);
 
@@ -191,7 +193,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date")] TransactionBetweenAccounts transactionBetweenAccounts)
+        public async Task<IActionResult> Edit(int id, [Bind("TransactionId,SenderId,RecipientId,Amount,Note,Date,CurrencyId")] TransactionBetweenAccounts transactionBetweenAccounts)
         {
             transactionBetweenAccounts.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transactionBetweenAccounts);
@@ -206,20 +208,22 @@ namespace HomeBudget.Controllers
                 try
                 {
                     var originalTransaction = await _context.TransactionBetweenAccounts.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+                    var originalTransactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalTransaction.CurrencyId);
 
                     var originalSenderAccount = await _context.Accounts.FindAsync(originalTransaction.SenderId);
                     var originalRecipientAccount = await _context.Accounts.FindAsync(originalTransaction.RecipientId);
-                    var originalSourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalSenderAccount.CurrencyId);
-                    var originalTargetCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalRecipientAccount.CurrencyId);
+                    var originalSenderCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalSenderAccount.CurrencyId);
+                    var originalRecipientCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalRecipientAccount.CurrencyId);
 
 
                     if (originalSenderAccount != null && originalRecipientAccount != null && originalSenderAccount != originalRecipientAccount)
                     {
-                        var OriginalCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalSourceCurrency.Code, originalTargetCurrency.Code);
+                        var originalSenderCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalTransactionCurrency.Code, originalSenderCurrency.Code);
+                        var originalRecipientCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalTransactionCurrency.Code, originalRecipientCurrency.Code);
 
-                        originalSenderAccount.Income += originalTransaction.Amount;
-                        originalRecipientAccount.Income -= OriginalCurrencyExchange;
-                        originalSenderAccount.Expanse -= originalTransaction.Amount;
+                        originalSenderAccount.Income += originalSenderCurrencyExchange;
+                        originalRecipientAccount.Income -= originalRecipientCurrencyExchange;
+                        originalSenderAccount.Expanse -= originalSenderCurrencyExchange;
 
                         var senderAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.SenderId);
                         var recipientAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.RecipientId);
@@ -228,15 +232,17 @@ namespace HomeBudget.Controllers
                         {
                             if (senderAccount.Income >= transactionBetweenAccounts.Amount)
                             {
-                                var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
-                                var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
+                                var senderCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
+                                var recipientCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
+                                var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transactionBetweenAccounts.CurrencyId);
 
-                                var currencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, sourceCurrency.Code, targetCurrency.Code);
+                                var senderCurrencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, transactionCurrency.Code, senderCurrency.Code);
+                                var recipientCurrencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, transactionCurrency.Code, recipientCurrency.Code);
 
-                                senderAccount.Expanse += transactionBetweenAccounts.Amount;
-                                recipientAccount.Income += currencyExchange;
+                                senderAccount.Expanse += senderCurrencyExchange;
+                                recipientAccount.Income += recipientCurrencyExchange;
+                                senderAccount.Income -= senderCurrencyExchange;
 
-                                senderAccount.Income -= transactionBetweenAccounts.Amount;
                                 _context.Update(transactionBetweenAccounts);
                                 await _context.SaveChangesAsync();
                                 return RedirectToAction(nameof(Index));
@@ -306,17 +312,18 @@ namespace HomeBudget.Controllers
                 return NotFound();
             }
 
-            var senderAccount = transactionBetweenAccounts.SenderAccount;
-            var recipientAccount = transactionBetweenAccounts.RecipientAccount;
+            var senderAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.SenderId);
+            var recipientAccount = await _context.Accounts.FindAsync(transactionBetweenAccounts.RecipientId);
+            var senderCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
+            var recipientCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
+            var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transactionBetweenAccounts.CurrencyId);
 
-            var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == senderAccount.CurrencyId);
-            var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == recipientAccount.CurrencyId);
-            var currencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, sourceCurrency.Code, targetCurrency.Code);
+            var senderCurrencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, transactionCurrency.Code, senderCurrency.Code);
+            var recipientCurrencyExchange = await CurrencyRateHelper.Calculate(transactionBetweenAccounts.Amount, transactionCurrency.Code, recipientCurrency.Code);
 
-
-            senderAccount.Income += transactionBetweenAccounts.Amount;
-            senderAccount.Expanse -= transactionBetweenAccounts.Amount;
-            recipientAccount.Income -= currencyExchange;
+            senderAccount.Income += senderCurrencyExchange;
+            senderAccount.Expanse -= senderCurrencyExchange;
+            recipientAccount.Income -= recipientCurrencyExchange;
 
             try
             {

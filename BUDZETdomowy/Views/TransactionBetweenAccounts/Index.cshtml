@@ -36,10 +36,7 @@
                 @Html.DisplayNameFor(model => model.Amount)
             </th>
             <th>
-                Sender currency
-            </th>
-            <th>
-                Recipient currency
+                @Html.DisplayNameFor(model => model.Currency)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Note)
@@ -63,10 +60,7 @@
                 @Html.DisplayFor(modelItem => item.Amount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SenderAccount.Currency.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RecipientAccount.Currency.Code)
+                @Html.DisplayFor(modelItem => item.Currency.Code)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Note)

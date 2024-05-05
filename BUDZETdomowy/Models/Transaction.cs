@@ -26,6 +26,10 @@ namespace HomeBudget.Models
         
         public DateTime Date { get; set; } = DateTime.Now;
 
+        [Range(1, int.MaxValue, ErrorMessage = "Please select the currency.")]
+        public int CurrencyId { get; set; }
+        public Currency? Currency { get; set; }
+
         public int UserId { get; set; }
         public User? User { get; set; }
     }

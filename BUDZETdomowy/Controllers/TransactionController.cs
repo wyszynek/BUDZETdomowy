@@ -27,7 +27,7 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
-            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Account.Currency).Include(t => t.Category).Where(t => t.UserId == currentUserId);
+            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Currency).Include(t => t.Category).Where(t => t.UserId == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -69,6 +69,7 @@ namespace HomeBudget.Controllers
                 worksheet.Cell(currentRow, 1).Value = "Category";
                 worksheet.Cell(currentRow, 2).Value = "Account";
                 worksheet.Cell(currentRow, 3).Value = "Amount";
+                worksheet.Cell(currentRow, 3).Value = "Currency";
                 worksheet.Cell(currentRow, 4).Value = "Date";
 
                 foreach (var transaction in transactions)
@@ -79,6 +80,7 @@ namespace HomeBudget.Controllers
                     worksheet.Cell(currentRow, 1).Value = categoryName;
                     worksheet.Cell(currentRow, 2).Value = accountName;
                     worksheet.Cell(currentRow, 3).Value = transaction.Amount;
+                    worksheet.Cell(currentRow, 3).Value = transaction.Currency.Code;
                     worksheet.Cell(currentRow, 4).Value = transaction.Date;
                 }
 
@@ -125,7 +127,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
+        public async Task<IActionResult> Create([Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date,CurrencyId")] Transaction transaction)
         {
             transaction.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transaction);
@@ -142,6 +144,9 @@ namespace HomeBudget.Controllers
                 var budget = _context.Budgets
                     .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
 
+                var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
+                var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
+
                 if (targetAccount != null && categoryType != null)
                 {
                     if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
@@ -153,35 +158,31 @@ namespace HomeBudget.Controllers
 
                     if (categoryType == "Income")
                     {
-                        targetAccount.Income += transaction.Amount;
-                        // Dodaj transakcję do kontekstu bazy danych
+                        var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
+
+                        targetAccount.Income += currencyExchange;
+
                         _context.Add(transaction);
-
-                        // Zapisz zmiany w bazie danych
                         await _context.SaveChangesAsync();
-
-                        // Przekieruj użytkownika do listy transakcji
                         return RedirectToAction(nameof(Index));
                     }
                     else if (categoryType == "Expense")
                     {
-                        targetAccount.Expanse += transaction.Amount;
-                        targetAccount.Income -= transaction.Amount;
-                        // Dodaj transakcję do kontekstu bazy danych
+                        var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
+
+                        targetAccount.Expanse += currencyExchange;
+                        targetAccount.Income -= currencyExchange;
+
+                        //if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
+                        //{
+                        //    if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                        //    {
+                        //        budget.BudgetProgress += transaction.Amount;
+                        //    }
+                        //}
+
                         _context.Add(transaction);
-
-                        if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
-                        {
-                            if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
-                            {
-                                budget.BudgetProgress += transaction.Amount;
-                            }
-                        }
-
-                        // Zapisz zmiany w bazie danych
                         await _context.SaveChangesAsync();
-
-                        // Przekieruj użytkownika do listy transakcji
                         return RedirectToAction(nameof(Index));
                     }
                 }
@@ -218,7 +219,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date")] Transaction transaction)
+        public async Task<IActionResult> Edit(int id, [Bind("TransactionId,CategoryId,AccountId,Amount,Note,Date,CurrencyId")] Transaction transaction)
         {
             transaction.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(transaction);
@@ -234,8 +235,12 @@ namespace HomeBudget.Controllers
                 try
                 {
                     var originalTransaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
-                    var targetAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
-                    
+                    var originalAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
+                    var originalTransactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalTransaction.CurrencyId);
+                    var originalAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalAccount.CurrencyId);
+                    var originalCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalTransactionCurrency.Code, originalAccountCurrency.Code);
+
+
                     var categoryType = _context.Categories
                         .Where(c => c.Id == transaction.CategoryId)
                         .Select(c => c.Type)
@@ -244,8 +249,14 @@ namespace HomeBudget.Controllers
                     var budget = _context.Budgets
                         .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
 
-                    if (targetAccount != null && categoryType != null)
+                    if (originalAccount != null && categoryType != null)
                     {
+                        var targetAccount = await _context.Accounts.FindAsync(transaction.AccountId);
+                        var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
+                        var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
+                        var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
+
+
                         if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
                         {
                             ModelState.AddModelError(string.Empty, "Insufficient funds in the account for this expense category.");
@@ -255,8 +266,12 @@ namespace HomeBudget.Controllers
 
                         if (categoryType == "Income")
                         {
-                            targetAccount.Income -= originalTransaction.Amount;
-                            targetAccount.Income += transaction.Amount;
+                            //oddajemy to co zabralismy
+                            originalAccount.Income -= originalCurrencyExchange;
+
+                            //przydzielamy do nowej osoby
+                            targetAccount.Income += currencyExchange;
+
                             _context.Update(transaction);
 
                             await _context.SaveChangesAsync();
@@ -265,20 +280,23 @@ namespace HomeBudget.Controllers
                         }
                         else if (categoryType == "Expense")
                         {
-                            targetAccount.Expanse -= originalTransaction.Amount;
-                            targetAccount.Income += originalTransaction.Amount;
+                            //oddajemy co zabralismy
+                            originalAccount.Expanse -= originalCurrencyExchange;
+                            originalAccount.Income += originalCurrencyExchange;
 
-                            targetAccount.Income -= transaction.Amount;
-                            targetAccount.Expanse += transaction.Amount;
-                            budget.BudgetProgress -= originalTransaction.Amount;
+                            //przydzielamy na nowo
+                            targetAccount.Income -= currencyExchange;
+                            targetAccount.Expanse += currencyExchange;
 
-                            if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
-                            {
-                                if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
-                                {
-                                    budget.BudgetProgress += transaction.Amount;
-                                }
-                            }
+                            //budget.BudgetProgress -= originalTransaction.Amount;
+
+                            //if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
+                            //{
+                            //    if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                            //    {
+                            //        budget.BudgetProgress += transaction.Amount;
+                            //    }
+                            //}
 
                             _context.Update(transaction);
 
@@ -336,7 +354,12 @@ namespace HomeBudget.Controllers
                 .Include(t => t.Account)
                 .Include(t => t.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            var targetAccount = transaction.Account;
+
+            var targetAccount = await _context.Accounts.FindAsync(transaction.AccountId);
+            var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
+            var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
+            var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
+            
             var categoryType = _context.Categories
                 .Where(c => c.Id == transaction.CategoryId)
                 .Select(c => c.Type)
@@ -352,17 +375,17 @@ namespace HomeBudget.Controllers
 
             if (categoryType == "Income") 
             {
-                targetAccount.Income -= transaction.Amount;
+                targetAccount.Income -= currencyExchange;
             }
             else if (categoryType == "Expense")
             {
-                targetAccount.Expanse -= transaction.Amount;
-                targetAccount.Income += transaction.Amount;
+                targetAccount.Expanse -= currencyExchange;
+                targetAccount.Income += currencyExchange;
 
-                if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
-                {
-                    budget.BudgetProgress -= transaction.Amount;
-                }
+                //if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                //{
+                //    budget.BudgetProgress -= transaction.Amount;
+                //}
             }
 
             try

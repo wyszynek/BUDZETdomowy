@@ -58,6 +58,12 @@ namespace HomeBudget.Data
                 .HasForeignKey(t => t.AccountId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Currency)
+                .WithMany()
+                .HasForeignKey(t => t.CurrencyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<Account>()
                 .HasOne(t => t.Currency)
                 .WithMany()

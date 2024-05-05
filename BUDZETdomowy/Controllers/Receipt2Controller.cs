@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HomeBudget.Data;
 using HomeBudget.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HomeBudget.Controllers
 {
+    [Authorize]
     public class Receipt2Controller : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +24,8 @@ namespace HomeBudget.Controllers
         // GET: Receipt2
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Receipts2.ToListAsync());
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            return View(await _context.Receipts2.Where(x => x.UserId == currentUserId).ToListAsync());
         }
 
         // GET: Receipt2/DisplayImage/5
@@ -53,6 +56,9 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Receipt2 receipt2)
         {
+            receipt2.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(receipt2);
+
             if (ModelState.IsValid)
             {
                 // Sprawdź czy użytkownik przesłał plik
@@ -137,6 +143,9 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ContentType,Data")] Receipt2 receipt2)
         {
+            receipt2.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(receipt2);
+
             if (id != receipt2.Id)
             {
                 return NotFound();

@@ -22,5 +22,8 @@ namespace HomeBudget.Models
         {
             ContentType = "JPG";
         }
+
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
 }

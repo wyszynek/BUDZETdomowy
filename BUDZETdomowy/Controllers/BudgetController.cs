@@ -25,7 +25,7 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
-            var applicationDbContext = _context.Budgets.Include(b => b.Account).Include(b => b.Category).Where(t => t.UserId == currentUserId);
+            var applicationDbContext = _context.Budgets.Include(b => b.Account).Include(t => t.Account.Currency).Include(b => b.Category).Where(t => t.UserId == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -181,15 +181,20 @@ namespace HomeBudget.Controllers
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
-            var userCategories = _context.Categories.Where(c => c.UserId == currentUserId).ToList();
+            var expenseCategories = _context.Categories.Where(c => c.UserId == currentUserId && c.Type == "Expense").ToList();
             Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
-            userCategories.Insert(0, DefaultCategory);
-            ViewBag.Categories = userCategories;
+            expenseCategories.Insert(0, DefaultCategory);
+            ViewBag.Categories = expenseCategories;
 
             var userAccounts = _context.Accounts.Where(a => a.UserId == currentUserId).ToList();
             Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
             userAccounts.Insert(0, DefaultAccount);
             ViewBag.Accounts = userAccounts;
+
+            var CurrencyCollection = _context.Currencies.ToList();
+            Currency DefaultCurrency = new Currency() { Id = 0, Code = "Choose a Currency" };
+            CurrencyCollection.Insert(0, DefaultCurrency);
+            ViewBag.Currencies = CurrencyCollection;
         }
     }
 }

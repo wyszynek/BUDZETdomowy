@@ -46,10 +46,10 @@
                 @Html.DisplayFor(modelItem => item.Category.CategoryName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Account.AccountName)
+                @Html.DisplayFor(modelItem => item.Account.AccountName) 
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Limit)
+                @Html.DisplayFor(modelItem => item.Limit) @Html.DisplayFor(modelItem => item.Account.Currency.Code)
             </td>
             <th>
                 @Html.DisplayFor(modelItem => item.BudgetProgress)

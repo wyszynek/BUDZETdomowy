@@ -42,7 +42,7 @@
                     {
                         if (account.Id != 0)
                         {
-                            string accountInfo = $"{account.AccountName} - {account.Income}";
+                            string accountInfo = $"{account.AccountName} - {account.Income} {account.Currency.Code}";
                             <option value="@account.Id">@accountInfo</option>
                         }
                         else

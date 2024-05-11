@@ -215,7 +215,6 @@ namespace HomeBudget.Controllers
                     var originalSenderCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalSenderAccount.CurrencyId);
                     var originalRecipientCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalRecipientAccount.CurrencyId);
 
-
                     if (originalSenderAccount != null && originalRecipientAccount != null && originalSenderAccount != originalRecipientAccount)
                     {
                         var originalSenderCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalTransactionCurrency.Code, originalSenderCurrency.Code);

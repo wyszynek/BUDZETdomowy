@@ -141,15 +141,15 @@ namespace HomeBudget.Controllers
                     .Select(c => c.Type)
                     .FirstOrDefault();
 
-                var budget = _context.Budgets
-                    .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
+                var budget = _context.Budgets.FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
 
                 var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
                 var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
+                var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
 
                 if (targetAccount != null && categoryType != null)
                 {
-                    if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
+                    if (categoryType == "Expense" && targetAccount.Income < currencyExchange)
                     {
                         ModelState.AddModelError(string.Empty, "Insufficient funds in the account for this expense category.");
                         PopulateCategoriesAndAccounts();
@@ -158,8 +158,6 @@ namespace HomeBudget.Controllers
 
                     if (categoryType == "Income")
                     {
-                        var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
-
                         targetAccount.Income += currencyExchange;
 
                         _context.Add(transaction);
@@ -168,18 +166,16 @@ namespace HomeBudget.Controllers
                     }
                     else if (categoryType == "Expense")
                     {
-                        var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
-
                         targetAccount.Expanse += currencyExchange;
                         targetAccount.Income -= currencyExchange;
 
-                        //if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
-                        //{
-                        //    if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
-                        //    {
-                        //        budget.BudgetProgress += transaction.Amount;
-                        //    }
-                        //}
+                        if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
+                        {
+                            if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                            {
+                                budget.BudgetProgress += currencyExchange;
+                            }
+                        }
 
                         _context.Add(transaction);
                         await _context.SaveChangesAsync();
@@ -239,15 +235,12 @@ namespace HomeBudget.Controllers
                     var originalTransactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalTransaction.CurrencyId);
                     var originalAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalAccount.CurrencyId);
                     var originalCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalTransactionCurrency.Code, originalAccountCurrency.Code);
-
+                    var originalBudget = _context.Budgets.FirstOrDefault(b => b.AccountId == originalTransaction.AccountId && b.CategoryId == originalTransaction.CategoryId);
 
                     var categoryType = _context.Categories
                         .Where(c => c.Id == transaction.CategoryId)
                         .Select(c => c.Type)
                         .FirstOrDefault();
-
-                    var budget = _context.Budgets
-                        .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
 
                     if (originalAccount != null && categoryType != null)
                     {
@@ -255,9 +248,10 @@ namespace HomeBudget.Controllers
                         var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
                         var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
                         var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
+                        var budget = _context.Budgets.FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
 
 
-                        if (categoryType == "Expense" && targetAccount.Income < transaction.Amount)
+                        if (categoryType == "Expense" && targetAccount.Income < currencyExchange)
                         {
                             ModelState.AddModelError(string.Empty, "Insufficient funds in the account for this expense category.");
                             PopulateCategoriesAndAccounts();
@@ -284,19 +278,26 @@ namespace HomeBudget.Controllers
                             originalAccount.Expanse -= originalCurrencyExchange;
                             originalAccount.Income += originalCurrencyExchange;
 
+                            if (originalBudget != null && originalTransaction.Date >= originalBudget.CreationTime && originalTransaction.Date <= originalBudget.EndTime)
+                            {
+                                if (originalTransaction.AccountId == originalBudget.AccountId && originalTransaction.CategoryId == originalBudget.CategoryId)
+                                {
+                                    originalBudget.BudgetProgress -= originalCurrencyExchange;
+                                }
+                            }
+
                             //przydzielamy na nowo
                             targetAccount.Income -= currencyExchange;
                             targetAccount.Expanse += currencyExchange;
 
-                            //budget.BudgetProgress -= originalTransaction.Amount;
-
-                            //if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
-                            //{
-                            //    if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
-                            //    {
-                            //        budget.BudgetProgress += transaction.Amount;
-                            //    }
-                            //}
+                            //dodajemy zaktualizowany budzet
+                            if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
+                            {
+                                if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                                {
+                                    budget.BudgetProgress += currencyExchange;
+                                }
+                            }
 
                             _context.Update(transaction);
 
@@ -365,8 +366,7 @@ namespace HomeBudget.Controllers
                 .Select(c => c.Type)
                 .FirstOrDefault();
 
-            var budget = _context.Budgets
-                .FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
+            var budget = _context.Budgets.FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
 
             if (transaction == null)
             {
@@ -382,10 +382,10 @@ namespace HomeBudget.Controllers
                 targetAccount.Expanse -= currencyExchange;
                 targetAccount.Income += currencyExchange;
 
-                //if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
-                //{
-                //    budget.BudgetProgress -= transaction.Amount;
-                //}
+                if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                {
+                    budget.BudgetProgress -= currencyExchange;
+                }
             }
 
             try

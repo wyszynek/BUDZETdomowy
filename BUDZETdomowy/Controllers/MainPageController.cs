@@ -24,10 +24,10 @@ namespace HomeBudget.Controllers
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
-            // Pobierz datę początkową (7 dni wstecz)
+            //data początkowa (7 dni wstecz)
             DateTime startDate = DateTime.Today.AddDays(-6);
 
-            // Pobierz dane transakcji dla ostatnich 7 dni
+            //dane transakcji dla ostatnich 7 dni
             var transactionsData = await _context.Transactions
                 .Where(t => t.UserId == currentUserId && t.Date >= startDate)
                 .GroupBy(t => t.Date.Date)
@@ -40,7 +40,7 @@ namespace HomeBudget.Controllers
                 .OrderBy(g => g.Date)
                 .ToListAsync();
 
-            // Utwórz listę dni i uzupełnij brakujące dni w przypadku braku transakcji
+            //lista dni i brakujące dni w przypadku braku transakcji
             List<DateTime> allDays = Enumerable.Range(0, 7).Select(i => startDate.AddDays(i)).ToList();
             var chartData = allDays.Select(day => new
             {
@@ -63,7 +63,7 @@ namespace HomeBudget.Controllers
                 .Take(5)
                 .ToListAsync();
 
-            // Calculate total income and total expenses for the current user
+
             decimal totalIncome = await _context.Transactions
                 .Where(t => t.UserId == currentUserId && t.Category.Type == "Income")
                 .SumAsync(t => t.Amount);

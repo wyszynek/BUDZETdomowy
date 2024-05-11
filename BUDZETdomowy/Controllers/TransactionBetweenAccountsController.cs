@@ -29,6 +29,7 @@ namespace HomeBudget.Controllers
             var transactionBetweenAccounts = _context.TransactionBetweenAccounts
                 .Include(t => t.SenderAccount)
                 .Include(t => t.RecipientAccount)
+                .Include(t => t.Currency)
                 .Where(t => t.UserId == currentUserId)
                 .ToList();
 
@@ -38,7 +39,7 @@ namespace HomeBudget.Controllers
             {
                 string senderName = TBA.SenderAccount?.AccountName ?? "Unknown";
                 string recipientName = TBA.RecipientAccount?.AccountName ?? "Unknown";
-                builder.AppendLine($"{senderName}, {recipientName}, {TBA.Amount}, {TBA.Date}");
+                builder.AppendLine($"{senderName}, {recipientName}, {TBA.Amount}, {TBA.Currency.Code}, {TBA.Date}");
             }
 
             return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "TransactionBetweenAccounts.csv");
@@ -50,6 +51,7 @@ namespace HomeBudget.Controllers
             var transactionBetweenAccounts = _context.TransactionBetweenAccounts
                 .Include(t => t.SenderAccount)
                 .Include(t => t.RecipientAccount)
+                .Include(t => t.Currency)
                 .Where(t => t.UserId == currentUserId)
                 .ToList();
 
@@ -60,7 +62,8 @@ namespace HomeBudget.Controllers
                 worksheet.Cell(currentRow, 1).Value = "Sender";
                 worksheet.Cell(currentRow, 2).Value = "Recipient";
                 worksheet.Cell(currentRow, 3).Value = "Amount";
-                worksheet.Cell(currentRow, 4).Value = "Date";
+                worksheet.Cell(currentRow, 4).Value = "Currency";
+                worksheet.Cell(currentRow, 5).Value = "Date";
 
                 foreach (var TBA in transactionBetweenAccounts)
                 {
@@ -70,7 +73,8 @@ namespace HomeBudget.Controllers
                     worksheet.Cell(currentRow, 1).Value = senderName;
                     worksheet.Cell(currentRow, 2).Value = recipientName;
                     worksheet.Cell(currentRow, 3).Value = TBA.Amount;
-                    worksheet.Cell(currentRow, 4).Value = TBA.Date;
+                    worksheet.Cell(currentRow, 4).Value = TBA.Currency.Code;
+                    worksheet.Cell(currentRow, 5).Value = TBA.Date;
                 }
                 using (var stream = new MemoryStream())
                 {

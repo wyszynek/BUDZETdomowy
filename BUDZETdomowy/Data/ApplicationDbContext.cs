@@ -92,5 +92,6 @@ namespace HomeBudget.Data
         public DbSet<TransactionBetweenAccounts> TransactionBetweenAccounts { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Receipt2> Receipts2 { get; set; }
+        public DbSet<SourceOfIncome> SourceOfIncomes { get; set; }
     }
 }

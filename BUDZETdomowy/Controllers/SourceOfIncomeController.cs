@@ -23,7 +23,8 @@ namespace HomeBudget.Controllers
         // GET: SourceOfIncome
         public async Task<IActionResult> Index()
         {
-            return View(await _context.SourceOfIncomes.ToListAsync());
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            return View(await _context.SourceOfIncomes.Where(x => x.UserId == currentUserId).ToListAsync());
         }
 
         // GET: SourceOfIncome/Details/5
@@ -58,6 +59,9 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,ContractType,SalaryType,VAT,HealthInsuranceType,Ratio")] SourceOfIncome sourceOfIncome)
         {
+            sourceOfIncome.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(sourceOfIncome);
+
             if (ModelState.IsValid)
             {
                 sourceOfIncome.Ratio = CalculateRatio(sourceOfIncome);
@@ -82,6 +86,7 @@ namespace HomeBudget.Controllers
             {
                 return NotFound();
             }
+            PopulateEnums();
             return View(sourceOfIncome);
         }
 
@@ -92,6 +97,9 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ContractType,SalaryType,VAT,HealthInsuranceType,Ratio")] SourceOfIncome sourceOfIncome)
         {
+            sourceOfIncome.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(sourceOfIncome);
+
             if (id != sourceOfIncome.Id)
             {
                 return NotFound();
@@ -99,6 +107,7 @@ namespace HomeBudget.Controllers
 
             if (ModelState.IsValid)
             {
+                sourceOfIncome.Ratio = CalculateRatio(sourceOfIncome);
                 try
                 {
                     _context.Update(sourceOfIncome);
@@ -117,6 +126,7 @@ namespace HomeBudget.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            PopulateEnums();
             return View(sourceOfIncome);
         }
 

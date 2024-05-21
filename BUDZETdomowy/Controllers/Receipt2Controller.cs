@@ -82,26 +82,6 @@ namespace HomeBudget.Controllers
             return View(receipt2);
         }
 
-        //// Metoda pomocnicza do odczytywania ContentType na podstawie rozszerzenia pliku
-        //private string GetContentTypeFromExtension(string fileName)
-        //{
-        //    string extension = Path.GetExtension(fileName).ToLowerInvariant();
-        //    switch (extension)
-        //    {
-        //        case ".jpg":
-        //        case ".jpeg":
-        //            return "image/jpeg";
-        //        case ".png":
-        //            return "image/png";
-        //        case ".gif":
-        //            return "image/gif";
-        //        // Dodaj dodatkowe rozszerzenia plików i ich ContentType według potrzeb
-        //        default:
-        //            return "application/octet-stream"; // Domyślny ContentType dla nieznanych rozszerzeń
-        //    }
-        //}
-
-
         // GET: Receipt2/Details/5
         public async Task<IActionResult> Details(int? id)
         {

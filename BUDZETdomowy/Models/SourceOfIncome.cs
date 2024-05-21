@@ -27,5 +27,8 @@ namespace HomeBudget.Models
         [Column(TypeName = "decimal(18, 2)")]
         [DisplayFormat(DataFormatString = "{0:F2}")]
         public decimal Ratio { get; set; }
+
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
 }

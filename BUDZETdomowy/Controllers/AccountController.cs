@@ -118,7 +118,7 @@ namespace HomeBudget.Controllers
                         var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == account.CurrencyId);
 
                         account.Income = await CurrencyRateHelper.Calculate(account.Income, sourceCurrency.Code, targetCurrency.Code);
-                        account.Expanse = await CurrencyRateHelper.Calculate(account.Expanse, sourceCurrency.Code, targetCurrency.Code);
+                        account.Expanse = await CurrencyRateHelper.Calculate(account.Expanse, sourceCurrency.Code, targetCurrency.Code);  
 
                         _context.Update(account);
                         await _context.SaveChangesAsync();

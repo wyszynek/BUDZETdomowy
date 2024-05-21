@@ -75,8 +75,7 @@ namespace HomeBudget.Controllers
                 return RedirectToAction(nameof(Index));
             }
             PopulateCategoriesAndAccounts();
-            //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName", budget.AccountId);
-            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", budget.CategoryId);
+
             return View(budget);
         }
 
@@ -116,6 +115,9 @@ namespace HomeBudget.Controllers
             {
                 try
                 {
+                    var originalBudget = await _context.Budgets.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+                    budget.BudgetProgress = originalBudget.BudgetProgress;
+
                     _context.Update(budget);
                     await _context.SaveChangesAsync();
                 }

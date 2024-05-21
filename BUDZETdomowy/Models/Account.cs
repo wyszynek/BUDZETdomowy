@@ -25,11 +25,6 @@ namespace HomeBudget.Models
 
         public decimal Balance => Income - Expanse;
 
-        public Account()
-        {
-            Expanse = 0;
-        }
-
         [Range(1, int.MaxValue, ErrorMessage = "Please select the currency.")]
         public int CurrencyId { get; set; }
         public Currency? Currency { get; set; }

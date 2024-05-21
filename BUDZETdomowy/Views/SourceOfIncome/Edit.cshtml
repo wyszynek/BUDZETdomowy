@@ -20,28 +20,23 @@
             </div>
             <div class="form-group">
                 <label asp-for="ContractType" class="control-label"></label>
-                <select asp-for="ContractType" class="form-control"></select>
+                <select asp-for="ContractType" class="form-control" asp-items="ViewBag.ContractType"></select>
                 <span asp-validation-for="ContractType" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="SalaryType" class="control-label"></label>
-                <select asp-for="SalaryType" class="form-control"></select>
+                <select asp-for="SalaryType" class="form-control" asp-items="ViewBag.SalaryType"></select>
                 <span asp-validation-for="SalaryType" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="VAT" class="control-label"></label>
-                <input asp-for="VAT" class="form-control" />
+                <input asp-for="VAT" class="form-control" type="number" step="0.01" />
                 <span asp-validation-for="VAT" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="HealthInsuranceType" class="control-label"></label>
-                <select asp-for="HealthInsuranceType" class="form-control"></select>
+                <select asp-for="HealthInsuranceType" class="form-control" asp-items="ViewBag.HealthInsuranceType"></select>
                 <span asp-validation-for="HealthInsuranceType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Ratio" class="control-label"></label>
-                <input asp-for="Ratio" class="form-control" />
-                <span asp-validation-for="Ratio" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

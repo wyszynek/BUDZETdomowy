@@ -11,7 +11,7 @@
 
 <div class="text-center">
     <form method="post" asp-controller="Transaction" asp-action="ExportToCSV">
-        <input type="submit" value="Export data to CSV"></input>
+        <button type="submit" class="btn btn-primary">Export data to CSV</button>
     </form>
 </div>
 
@@ -19,12 +19,12 @@
 
 <div class="text-center">
     <form method="post" asp-controller="Transaction" asp-action="ExportToExcel">
-        <input type="submit" value="Export data to Excel"></input>
+        <button type="submit" class="btn btn-primary">Export data to Excel</button>
     </form>
 </div>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
 </p>
 
 <table class="table" id="transactionsTable">
@@ -77,9 +77,9 @@
                     @Html.DisplayFor(modelItem => item.Date)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         }

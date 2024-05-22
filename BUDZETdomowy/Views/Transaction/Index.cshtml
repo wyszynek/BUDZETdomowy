@@ -30,25 +30,52 @@
 <table class="table" id="transactionsTable">
     <thead>
         <tr>
-            <th>Category</th>
-            <th>Account</th>
-            <th>Amount</th>
-            <th>Currency</th>
-            <th>Note</th>
-            <th>Date</th>
-            <th>Action</th>
+            <th>
+                Category
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Currency)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Note)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.OrderBy(item => item.Category.CategoryName))
         {
             <tr>
-                <td>@Html.Raw(item.Category.Icon) @Html.DisplayFor(modelItem => item.Category.CategoryName)</td>
-                <td>@Html.DisplayFor(modelItem => item.Account.AccountName)</td>
-                <td>@Html.DisplayFor(modelItem => item.Amount)</td>
-                <td>@Html.DisplayFor(modelItem => item.Currency.Code)</td>
-                <td>@Html.DisplayFor(modelItem => item.Note)</td>
-                <td>@Html.DisplayFor(modelItem => item.Date)</td>
+                <td>
+                    <div>
+                        <span>@Html.Raw(item.Category.Icon)</span>
+                        @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account.AccountName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Currency.Code)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Note)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
@@ -59,7 +86,7 @@
     </tbody>
 </table>
 
-<!--uzywamy jQuery aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
+<!--uzywamy jQuery (biblioteka JavaScript od manipulacji HTML) aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
 @section Scripts {
     <!--ladujemy biblioteke ktora dostarcza funkcji do interakcji z tabela-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

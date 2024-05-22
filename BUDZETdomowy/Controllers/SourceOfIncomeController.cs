@@ -191,7 +191,30 @@ namespace HomeBudget.Controllers
 
         private decimal CalculateRatio(SourceOfIncome sourceOfIncome)
         {
-            return (decimal)sourceOfIncome.ContractType + (decimal)sourceOfIncome.SalaryType / (decimal)sourceOfIncome.HealthInsuranceType;
+            return NewContractWeight(sourceOfIncome.ContractType) + (decimal)sourceOfIncome.SalaryType / (decimal)sourceOfIncome.HealthInsuranceType / ((decimal)sourceOfIncome.VAT * (decimal)0.1);
         }
+
+        private decimal NewContractWeight(ContractType contractType)
+        {
+            if (contractType == ContractType.OrderContract)
+            {
+                return 0.75m;
+            }
+            else if (contractType == ContractType.EmploymentContract)
+            {
+                return 1;
+            }
+            else if (contractType == ContractType.ContractForWork)
+            {
+                return 1.2m;
+            }
+            else if (contractType == ContractType.Practice)
+            {
+                return 0.5m;
+            }
+
+            return 0; 
+        }
+
     }
 }

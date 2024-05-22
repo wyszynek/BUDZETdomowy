@@ -2,7 +2,7 @@
 {
     public enum HealthInsuranceType
     {
-        None = 100,
-        Possess = 90 
+        None = 10,
+        Possess = 20 
     }
 }

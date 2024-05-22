@@ -2,9 +2,9 @@
 {
     public enum ContractType
     {
-        Practice = 1, //staz
-        OrderContract = 2, //umowa zlecenie
-        EmploymentContract = 3, //umowa o prace
-        ContractForWork = 4, //umowa o dzielo
+        Practice = 0, //staz
+        OrderContract = 1, //umowa zlecenie
+        EmploymentContract = 2, //umowa o prace
+        ContractForWork = 3, //umowa o dzielo
     }
 }

@@ -2,7 +2,7 @@
 {
     public enum SalaryType
     {
-        Brutto = 10,
-        Netto = 20
+        Brutto = 1,
+        Netto = 2
     }
 }

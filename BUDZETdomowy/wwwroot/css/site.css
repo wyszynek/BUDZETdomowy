@@ -128,3 +128,9 @@ body {
 .theme-toggle-btn {
     margin-left: 0.5rem;
 }
+
+/*wielkosc zdjecia*/
+.limited-size {
+    max-width: 100px;
+    max-height: 100px;
+}

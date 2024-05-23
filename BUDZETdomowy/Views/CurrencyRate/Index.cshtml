@@ -1,12 +1,15 @@
 ﻿@model IEnumerable<HomeBudget.Models.CurrencyRate>
 
 @{
-    ViewData["Title"] = "Currency rates";
+    ViewData["Title"] = "Currency exchange rates";
 }
 
-<h1>Currency rates</h1>
+<!--ladujemy biblioteke stylizacji-->
+<link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 
-<table class="table">
+<h1>Currency exchange rates</h1>
+
+<table class="table" id="transactionsTable">
     <thead>
         <tr>
             <th>
@@ -37,3 +40,15 @@
 }
     </tbody>
 </table>
+
+<!--uzywamy jQuery aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
+@section Scripts {
+    <!--ladujemy biblioteke ktora dostarcza funkcji do interakcji z tabela-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#transactionsTable').DataTable();
+        });
+    </script>
+}

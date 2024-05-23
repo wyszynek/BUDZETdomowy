@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<HomeBudget.Models.TransactionBetweenAccounts>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Transaction between accounts";
 }
 
 <!--ladujemy biblioteke stylizacji-->
 <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 
-<h1>Index</h1>
+<h1>Transaction between accounts</h1>
 
 <div class="text-center">
     <form method="post" asp-controller="TransactionBetweenAccounts" asp-action="ExportToCSV">

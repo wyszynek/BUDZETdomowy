@@ -15,12 +15,12 @@ body {
 }
 
 .white-theme {
-    background-color: #fff;
+    background: linear-gradient(to bottom right, #ffffff, #f8f8f8);
     color: #000;
 }
 
 .dark-theme {
-    background-color: #444;
+    background: linear-gradient(to bottom, #444 0%, #222 100%);
     color: #fff;
 }
 
@@ -32,7 +32,7 @@ body {
 /* Stylowanie tabeli DataTable dla ciemnego motywu */
 .dark-theme .dataTables_wrapper {
     color: #fff;
-    background-color: #444;
+    background: linear-gradient(to upper, #444 0%, #222 100%);
 }
 
 /* Stylowanie paginacji DataTable dla ciemnego motywu */

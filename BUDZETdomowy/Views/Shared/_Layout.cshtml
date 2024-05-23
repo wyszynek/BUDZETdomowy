@@ -38,8 +38,11 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
                         </li>
                     </ul>
                     <form method="post" asp-controller="Theme" asp-action="SetTheme" class="d-inline">
-                        <button type="submit" name="theme" value="white-theme" class="btn btn-outline-dark">Light Theme</button>
-                        <button type="submit" name="theme" value="dark-theme" class="btn btn-outline-dark">Dark Theme</button>
+                        <select name="theme" class="form-select" onchange="this.form.submit()">
+                            <option>Change theme</option>
+                            <option value="white-theme">Light Theme</option>
+                            <option value="dark-theme">Dark Theme</option>
+                        </select>
                     </form>
                 </div>
             </div>

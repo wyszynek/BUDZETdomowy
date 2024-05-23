@@ -1,7 +1,7 @@
 ﻿@model HomeBudget.Models.Receipt2
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Receipt details";
 }
 
 <h1>Details</h1>
@@ -23,7 +23,7 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Data)
+            Image
         </dt>
         <dd class="col-sm-10">
             @if (Model.Data != null && Model.ContentType.StartsWith("image"))

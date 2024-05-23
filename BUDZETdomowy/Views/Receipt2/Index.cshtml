@@ -1,15 +1,18 @@
 ﻿@model IEnumerable<HomeBudget.Models.Receipt2>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Receipts";
 }
 
-<h1>Index</h1>
+<!--ladujemy biblioteke stylizacji-->
+<link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<h1>Receipts</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table" id="transactionsTable">
     <thead>
         <tr>
             <th>
@@ -39,7 +42,7 @@
                     {
                         var imageBase64 = Convert.ToBase64String(item.Data);
                         var imageUrl = $"data:{item.ContentType};base64,{imageBase64}";
-                        <img src="@imageUrl" alt="@item.Name" />
+                        <img src="@imageUrl" alt="@item.Name" style="max-width: 100px; max-height: 100px;" />
                     }
                     else
                     {
@@ -47,11 +50,23 @@
                     }
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!--uzywamy jQuery aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
+@section Scripts {
+    <!--ladujemy biblioteke ktora dostarcza funkcji do interakcji z tabela-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#transactionsTable').DataTable();
+        });
+    </script>
+}

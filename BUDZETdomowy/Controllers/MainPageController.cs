@@ -34,8 +34,8 @@ namespace HomeBudget.Controllers
                 .Select(g => new
                 {
                     Date = g.Key,
-                    Income = g.Where(t => t.Category.Type == "Income").Select(t => CurrencyRateHelper.Calculate(t.Amount, t.Currency.Code, "PLN").Result).Sum(),
-                    Expense = g.Where(t => t.Category.Type == "Expense").Select(t => CurrencyRateHelper.Calculate(t.Amount, t.Currency.Code, "PLN").Result).Sum()
+                    Income = g.Where(t => t.Category.Type == "Income").Select(t => t.Amount).Sum(),
+                    Expense = g.Where(t => t.Category.Type == "Expense").Select(t => t.Amount).Sum()
                 })
                 .OrderBy(g => g.Date)
                 .ToListAsync();

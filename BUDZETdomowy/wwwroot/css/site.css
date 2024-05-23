@@ -1,22 +1,130 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+.white-theme {
+    background-color: #fff;
+    color: #000;
+}
+
+.dark-theme {
+    background-color: #444;
+    color: #fff;
+}
+
+/* Stylowanie elementów po aktywacji */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb; /* Cieñ przy fokusowaniu */
+}
+
+/* Stylowanie tabeli DataTable dla ciemnego motywu */
+.dark-theme .dataTables_wrapper {
+    color: #fff;
+    background-color: #444;
+}
+
+/* Stylowanie paginacji DataTable dla ciemnego motywu */
+.dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #fff;
+    background-color: #666;
+}
+
+/* Aktualnie zaznaczona strona w paginacji */
+.dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #000 !important;
+    background-color: #fff !important;
+}
+
+    /*styl wszystkich info*/
+    .dark-theme .dataTables_wrapper .dataTables_length label,
+    .dark-theme .dataTables_wrapper .dataTables_filter label,
+    .dark-theme .dataTables_wrapper .dataTables_info {
+        color: #fff;
+    }
+
+    .dark-theme .dataTables_wrapper .dataTables_length select,
+    .dark-theme .dataTables_wrapper .dataTables_filter input {
+        color: #fff; 
+        background-color: #666;
+        border: 1px solid #fff;
+    }
+
+        /*opcje select i input*/
+        .dark-theme .dataTables_wrapper .dataTables_length select option,
+        .dark-theme .dataTables_wrapper .dataTables_filter input {
+            color: #000;
+            background-color: #fff;
+        }
+
+/*wiersze tabeli*/
+.dark-theme table.dataTable tbody tr {
+    background-color: #666;
+    color: #fff;
+}
+
+/*naglowek tabeli*/
+.dark-theme table.dataTable thead {
+    background-color: #555;
+    color: #fff;
+}
+
+/* Stylowanie stopki tabeli dla ciemnego motywu */
+.dark-theme table.dataTable tfoot {
+    background-color: #555;
+    color: #fff;
+}
+
+/*styl przyciskow*/
+.btn-primary, .btn-success, .btn-danger, .btn-info {
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+}
+
+/*normalne create*/
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+/*create w indexie*/
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}
+
+/*delete*/
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+/*details*/
+.btn-info {
+    background-color: #17a2b8;
+    border: none;
+}
+
+/*zamiana koloru po najechaniu myszka*/
+.btn:hover, .btn:focus {
+    opacity: 0.85; /* przezroczystosc */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* cien */
+}
+
+/*styl przyciskow od theme*/
+.theme-toggle-btn {
+    margin-left: 0.5rem;
 }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HomeBudget.Data;
 using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
+using HomeBudget.Migrations;
 
 namespace HomeBudget.Controllers
 {
@@ -46,6 +47,41 @@ namespace HomeBudget.Controllers
 
             return View(account);
         }
+
+        public IActionResult CreateEmergencyFund()
+        {
+            PopulateCurrency();
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateEmergencyFund([Bind("AccountId,AccountName,Note,Income,Expanse,CurrencyId")] Account account)
+        {
+            account.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(account);
+
+            var existingEmergencyFund = await _context.Accounts.FirstOrDefaultAsync(a => a.UserId == account.UserId && a.AccountName == "Emergency Fund");
+
+            if (existingEmergencyFund != null)
+            {
+                // Jeśli użytkownik ma już konto awaryjne, przekieruj go do szczegółów istniejącego konta.
+                return RedirectToAction("Details", new { id = existingEmergencyFund.Id });
+            }
+
+            account.AccountName = "Emergency Fund";
+            account.Note = "Emergency Fund";
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(account);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            PopulateCurrency();
+            return View(account);
+        }
+
 
         // GET: Account/Create
         public IActionResult Create()

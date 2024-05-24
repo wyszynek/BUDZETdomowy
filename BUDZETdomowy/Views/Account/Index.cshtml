@@ -10,14 +10,19 @@
 <h1>Accounts</h1>
 
 <div class="text-center">
-    <form method="post" asp-controller="Account" asp-action="CreateEmergencyFund">
-        <button type="submit" class="btn btn-primary">Create emergency fund</button>
-    </form>
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="mb-0">
+            <a asp-action="Create" class="btn btn-success">Create New</a>
+        </p>
+        
+        <form method="post" asp-controller="Account" asp-action="CreateEmergencyFund">
+            <button type="submit" class="btn btn-primary">Create emergency fund</button>
+        </form>
+    </div>
 </div>
 
-<p>
-    <a asp-action="Create" class="btn btn-success">Create New</a>
-</p>
+<p></p>
+
 <table class="table" id="transactionsTable">
     <thead>
         <tr>

@@ -10,22 +10,23 @@
 <h1>Transaction between accounts</h1>
 
 <div class="text-center">
-    <form method="post" asp-controller="TransactionBetweenAccounts" asp-action="ExportToCSV">
-        <button type="submit" class="btn btn-primary">Export data to CSV</button>
-    </form>
+    <div class="d-flex justify-content-between align-items-center">
+        <p>
+            <a asp-action="Create" class="btn btn-success">Create New</a>
+        </p>
+
+        <form method="post" asp-controller="TransactionBetweenAccounts" asp-action="ExportToCSV">
+            <button type="submit" class="btn btn-primary">Export data to CSV</button>
+        </form>
+
+        <form method="post" asp-controller="TransactionBetweenAccounts" asp-action="ExportToExcel">
+            <button type="submit" class="btn btn-primary">Export data to Excel</button>
+        </form>
+    </div>
 </div>
 
 <p></p>
 
-<div class="text-center">
-    <form method="post" asp-controller="TransactionBetweenAccounts" asp-action="ExportToExcel">
-        <button type="submit" class="btn btn-primary">Export data to Excel</button>
-    </form>
-</div>
-
-<p>
-    <a asp-action="Create" class="btn btn-success">Create New</a>
-</p>
 <table class="table" id="transactionsTable">
     <thead>
         <tr>

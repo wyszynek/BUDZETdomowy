@@ -4,7 +4,7 @@
     ViewData["Title"] = "Budgets";
 }
 
-<!--ladujemy biblioteke stylizacji-->
+<!--ładujemy bibliotekę stylizacji-->
 <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 
 <h1>Budgets</h1>
@@ -28,7 +28,7 @@
                 @Html.DisplayNameFor(model => model.Limit)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BudgetProgress)
+                (%) of used Budget
             </th>
             <th>
                 Start Date
@@ -40,44 +40,58 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.BudgetName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Account.AccountName) 
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Limit) @Html.DisplayFor(modelItem => item.Account.Currency.Code)
-            </td>
-            <th>
-                @Html.DisplayFor(modelItem => item.BudgetProgress)
-            </th>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreationTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
+        @foreach (var item in Model)
+        {
+            // Obliczamy procentowy postęp
+            var progressPercentage = (item.BudgetProgress / item.Limit) * 100;
+            var progressClass = progressPercentage switch
+            {
+                <= 33 => "low",
+                <= 66 => "medium",
+                _ => "high"
+            };
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BudgetName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account.AccountName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Limit) @Html.DisplayFor(modelItem => item.Account.Currency.Code)
+                </td>
+                <td>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar @progressClass" role="progressbar" style="width:@progressPercentage%;" aria-valuenow="@progressPercentage" aria-valuemin="0" aria-valuemax="100">
+                            @progressPercentage.ToString("0.00")%
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreationTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndTime)
+                </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
                     <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
                 </td>
-        </tr>
-}
+            </tr>
+        }
     </tbody>
 </table>
 
-<!--uzywamy jQuery aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
+<!--używamy jQuery aby poczekać na załadowanie dokumentu i następnie wywołać funkcję datatable na identyfikatorze 'transactionsTable'-->
 @section Scripts {
-    <!--ladujemy biblioteke ktora dostarcza funkcji do interakcji z tabela-->
+    <!--ładujemy bibliotekę która dostarcza funkcji do interakcji z tabelą-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
             $('#transactionsTable').DataTable();

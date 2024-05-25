@@ -134,3 +134,31 @@ body {
     max-width: 100px;
     max-height: 100px;
 }
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 20px;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+    line-height: 20px;
+    transition: width 0.5s;
+}
+
+    .progress-bar.high {
+        background-color: #ff4d4d;
+    }
+
+    .progress-bar.medium {
+        background-color: #ffcc00;
+    }
+
+    .progress-bar.low {
+        background-color: #4caf50;
+    }

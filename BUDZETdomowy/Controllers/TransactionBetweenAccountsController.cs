@@ -104,6 +104,7 @@ namespace HomeBudget.Controllers
             var transactionBetweenAccounts = await _context.TransactionBetweenAccounts
                 .Include(t => t.RecipientAccount)
                 .Include(t => t.SenderAccount)
+                .Include(a => a.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (transactionBetweenAccounts == null)
             {
@@ -291,6 +292,7 @@ namespace HomeBudget.Controllers
             var transactionBetweenAccounts = await _context.TransactionBetweenAccounts
                 .Include(t => t.RecipientAccount)
                 .Include(t => t.SenderAccount)
+                .Include(a => a.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (transactionBetweenAccounts == null)
             {

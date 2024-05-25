@@ -39,6 +39,7 @@ namespace HomeBudget.Controllers
             }
 
             var account = await _context.Accounts
+                .Include(a => a.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (account == null)
             {
@@ -191,7 +192,9 @@ namespace HomeBudget.Controllers
             }
 
             var account = await _context.Accounts
+                .Include(a => a.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (account == null)
             {
                 return NotFound();

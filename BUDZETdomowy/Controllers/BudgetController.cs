@@ -40,6 +40,7 @@ namespace HomeBudget.Controllers
             var budget = await _context.Budgets
                 .Include(b => b.Account)
                 .Include(b => b.Category)
+                .Include(b => b.Account.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (budget == null)
             {
@@ -149,6 +150,7 @@ namespace HomeBudget.Controllers
             var budget = await _context.Budgets
                 .Include(b => b.Account)
                 .Include(b => b.Category)
+                .Include(b => b.Account.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (budget == null)
             {

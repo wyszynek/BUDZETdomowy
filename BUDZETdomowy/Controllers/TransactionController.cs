@@ -106,6 +106,7 @@ namespace HomeBudget.Controllers
             var transaction = await _context.Transactions
                 .Include(t => t.Account)
                 .Include(t => t.Category)
+                .Include(a => a.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (transaction == null)
             {
@@ -338,6 +339,7 @@ namespace HomeBudget.Controllers
             var transaction = await _context.Transactions
                 .Include(t => t.Account)
                 .Include(t => t.Category)
+                .Include(a => a.Currency)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (transaction == null)
             {

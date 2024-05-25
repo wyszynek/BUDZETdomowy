@@ -13,7 +13,7 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="AccountName" class="control-label"></label>
+                <label asp-for="AccountName" class="control-label">Name</label>
                 <input asp-for="AccountName" class="form-control" readonly="readonly" />
             </div>
             <div class="form-group">
@@ -26,7 +26,7 @@
                 <span asp-validation-for="Income" class="text-danger"></span>
             </div>
             <div>
-                <label asp-for="CurrencyId" class="control-label"></label>
+                <label asp-for="CurrencyId" class="control-label">Currency</label>
                 <select asp-for="CurrencyId" class="form-control" asp-items="@(new SelectList(ViewBag.Currencies, "Id", "Code"))">
                 </select>
                 <span asp-validation-for="CurrencyId" class="text-danger"></span>

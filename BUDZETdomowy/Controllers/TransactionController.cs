@@ -143,7 +143,7 @@ namespace HomeBudget.Controllers
                     .Select(c => c.Type)
                     .FirstOrDefault();
 
-                var budget = _context.Budgets.FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
+                var budgets = _context.Budgets.Where(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId).ToList();
 
                 var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
                 var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
@@ -171,9 +171,9 @@ namespace HomeBudget.Controllers
                         targetAccount.Expanse += currencyExchange;
                         targetAccount.Income -= currencyExchange;
 
-                        if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
+                        foreach (var budget in budgets)
                         {
-                            if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                            if (transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
                             {
                                 budget.BudgetProgress += currencyExchange;
                             }
@@ -237,7 +237,7 @@ namespace HomeBudget.Controllers
                     var originalTransactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalTransaction.CurrencyId);
                     var originalAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalAccount.CurrencyId);
                     var originalCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalTransactionCurrency.Code, originalAccountCurrency.Code);
-                    var originalBudget = _context.Budgets.FirstOrDefault(b => b.AccountId == originalTransaction.AccountId && b.CategoryId == originalTransaction.CategoryId);
+                    var originalBudgets = _context.Budgets.Where(b => b.AccountId == originalTransaction.AccountId && b.CategoryId == originalTransaction.CategoryId).ToList();
 
                     var categoryType = _context.Categories
                         .Where(c => c.Id == transaction.CategoryId)
@@ -250,8 +250,7 @@ namespace HomeBudget.Controllers
                         var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
                         var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
                         var currencyExchange = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
-                        var budget = _context.Budgets.FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
-
+                        var budgets = _context.Budgets.Where(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId).ToList();
 
                         if (categoryType == "Expense" && targetAccount.Income < currencyExchange)
                         {
@@ -280,11 +279,11 @@ namespace HomeBudget.Controllers
                             originalAccount.Expanse -= originalCurrencyExchange;
                             originalAccount.Income += originalCurrencyExchange;
 
-                            if (originalBudget != null && originalTransaction.Date >= originalBudget.CreationTime && originalTransaction.Date <= originalBudget.EndTime)
+                            foreach (var originalBudget in originalBudgets)
                             {
-                                if (originalTransaction.AccountId == originalBudget.AccountId && originalTransaction.CategoryId == originalBudget.CategoryId)
+                                if (originalTransaction.Date >= originalBudget.CreationTime && originalTransaction.Date <= originalBudget.EndTime)
                                 {
-                                    originalBudget.BudgetProgress -= originalCurrencyExchange;
+                                    originalBudget.BudgetProgress += currencyExchange;
                                 }
                             }
 
@@ -293,9 +292,9 @@ namespace HomeBudget.Controllers
                             targetAccount.Expanse += currencyExchange;
 
                             //dodajemy zaktualizowany budzet
-                            if (budget != null && transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
+                            foreach (var budget in budgets)
                             {
-                                if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                                if (transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
                                 {
                                     budget.BudgetProgress += currencyExchange;
                                 }
@@ -368,7 +367,7 @@ namespace HomeBudget.Controllers
                 .Select(c => c.Type)
                 .FirstOrDefault();
 
-            var budget = _context.Budgets.FirstOrDefault(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId);
+            var budgets = _context.Budgets.Where(b => b.AccountId == transaction.AccountId && b.CategoryId == transaction.CategoryId).ToList();
 
             if (transaction == null)
             {
@@ -384,9 +383,12 @@ namespace HomeBudget.Controllers
                 targetAccount.Expanse -= currencyExchange;
                 targetAccount.Income += currencyExchange;
 
-                if (transaction.AccountId == budget.AccountId && transaction.CategoryId == budget.CategoryId)
+                foreach (var budget in budgets)
                 {
-                    budget.BudgetProgress -= currencyExchange;
+                    if (transaction.Date >= budget.CreationTime && transaction.Date <= budget.EndTime)
+                    {
+                        budget.BudgetProgress -= currencyExchange;
+                    }
                 }
             }
 

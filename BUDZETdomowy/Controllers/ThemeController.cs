@@ -9,9 +9,9 @@ public class ThemeController : Controller
         //CookieOptions to obiekt konfiguracyjny ktory okresla opcje, w naszym przypadk Expire (czyli nasze ciasteczko jest wazne rok)
         Response.Cookies.Append("Theme", theme, new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
 
-        //służy do przekierowania klienta na inny adres URL. W tym przypadku jest przekierowywany na
-        //adres URL poprzedniej strony, z której zostało wykonane żądanie.
-        //Referer zawiera adres URL poprzedniej strony na ktorym zostalo wykonane zadanie
+        //sluzy do przekierowania klienta na inny adres URL, w tym przypadku jest przekierowywany na
+        //adres URL poprzedniej strony, z ktorej zostało wykonane żądanie.
+        //Referer jest używany do przekierowania użytkownika z powrotem do strony, z której zostało wysłane żądanie
         return Redirect(Request.Headers["Referer"].ToString());
     }
 }

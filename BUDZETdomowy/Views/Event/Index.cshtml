@@ -1,0 +1,96 @@
+﻿@model IEnumerable<HomeBudget.Models.Event>
+
+@{
+    ViewData["Title"] = "Calendar";
+}
+
+<h1>Calendar</h1>
+
+<head>
+    <meta charset='utf-8' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.13/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: '/Event/GetEvents', // Endpoint to get events
+                dateClick: function (info) {
+                    var title = prompt('Enter Event Title:');
+                    var startDate = info.dateStr;
+
+                    if (title) {
+                        var eventData = {
+                            title: title,
+                            start: startDate
+                        };
+
+                        fetch('/Event/CreateEvent', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(eventData)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.id) {
+                                    calendar.addEvent({
+                                        id: data.id,
+                                        title: data.title,
+                                        start: data.start
+                                    });
+                                } else {
+                                    alert('Failed to create event');
+                                }
+                            });
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
+</head>
+<body>
+    <div id='calendar'></div>
+</body>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.End)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Start)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.End)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

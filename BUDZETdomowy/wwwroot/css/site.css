@@ -48,26 +48,26 @@ body {
     background-color: #fff !important;
 }
 
-    /*styl wszystkich info*/
-    .dark-theme .dataTables_wrapper .dataTables_length label,
-    .dark-theme .dataTables_wrapper .dataTables_filter label,
-    .dark-theme .dataTables_wrapper .dataTables_info {
-        color: #fff;
-    }
+/*styl wszystkich info*/
+.dark-theme .dataTables_wrapper .dataTables_length label,
+.dark-theme .dataTables_wrapper .dataTables_filter label,
+.dark-theme .dataTables_wrapper .dataTables_info {
+    color: #fff;
+}
 
-    .dark-theme .dataTables_wrapper .dataTables_length select,
-    .dark-theme .dataTables_wrapper .dataTables_filter input {
-        color: #fff; 
-        background-color: #666;
-        border: 1px solid #fff;
-    }
+.dark-theme .dataTables_wrapper .dataTables_length select,
+.dark-theme .dataTables_wrapper .dataTables_filter input {
+    color: #fff; 
+    background-color: #666;
+    border: 1px solid #fff;
+}
 
-        /*opcje select i input*/
-        .dark-theme .dataTables_wrapper .dataTables_length select option,
-        .dark-theme .dataTables_wrapper .dataTables_filter input {
-            color: #000;
-            background-color: #fff;
-        }
+/*opcje select i input*/
+.dark-theme .dataTables_wrapper .dataTables_length select option,
+.dark-theme .dataTables_wrapper .dataTables_filter input {
+    color: #000;
+    background-color: #fff;
+}
 
 /*wiersze tabeli*/
 .dark-theme table.dataTable tbody tr {
@@ -135,6 +135,7 @@ body {
     max-height: 100px;
 }
 
+/*pasek progresu budzetu*/
 .progress-bar-container {
     width: 100%;
     background-color: #e0e0e0;
@@ -151,14 +152,14 @@ body {
     transition: width 0.5s;
 }
 
-    .progress-bar.high {
-        background-color: #ff4d4d;
-    }
+.progress-bar.high {
+    background-color: #ff4d4d;
+}
 
-    .progress-bar.medium {
-        background-color: #ffcc00;
-    }
+.progress-bar.medium {
+    background-color: #ffcc00;
+}
 
-    .progress-bar.low {
-        background-color: #4caf50;
-    }
+.progress-bar.low {
+    background-color: #4caf50;
+}

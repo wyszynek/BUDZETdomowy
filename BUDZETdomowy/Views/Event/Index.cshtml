@@ -17,10 +17,10 @@
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                events: '/Event/GetEvents', // Endpoint to get events
+                events: '/Event/GetEvents',
                 dateClick: function (info) {
-                    var title = prompt('Enter Event Title:');
-                    var startDate = info.dateStr;
+                    //var title = prompt('Enter Event Title:');
+                    //var startDate = info.dateStr;
 
                     if (title) {
                         var eventData = {

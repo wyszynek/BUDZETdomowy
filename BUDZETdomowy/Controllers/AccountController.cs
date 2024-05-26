@@ -99,7 +99,6 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> Create([Bind("AccountId,AccountName,Note,Income,Expanse,CurrencyId")] Account account)
         {
             account.UserId = UserHelper.GetCurrentUserId(HttpContext);
-
             await TryUpdateModelAsync(account);
 
             if (ModelState.IsValid)

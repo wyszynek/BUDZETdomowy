@@ -4,7 +4,10 @@
     ViewData["Title"] = "Calendar";
 }
 
-<h1>Calendar</h1>
+<!--ladujemy biblioteke stylizacji-->
+<link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<h1 class="display-4">Calendar</h1>
 
 <head>
     <meta charset='utf-8' />
@@ -55,10 +58,12 @@
     <div id='calendar'></div>
 </body>
 
+<p></p>
+
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
 </p>
-<table class="table">
+<table class="table" id="transactionsTable">
     <thead>
         <tr>
             <th>
@@ -86,11 +91,23 @@
                 @Html.DisplayFor(modelItem => item.End)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<!--uzywamy jQuery aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
+@section Scripts {
+    <!--ladujemy biblioteke ktora dostarcza funkcji do interakcji z tabela-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#transactionsTable').DataTable();
+        });
+    </script>
+}

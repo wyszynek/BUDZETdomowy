@@ -22,7 +22,8 @@ namespace HomeBudget.Controllers
         // GET: Event
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Events.ToListAsync());
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            return View(await _context.Events.Where(x => x.UserId == currentUserId).ToListAsync());
         }
 
         // GET: Event/Details/5
@@ -56,6 +57,9 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Start,End")] Event @event)
         {
+            @event.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(@event);
+
             if (ModelState.IsValid)
             {
                 _context.Add(@event);
@@ -88,6 +92,9 @@ namespace HomeBudget.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Start,End")] Event @event)
         {
+            @event.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(@event);
+
             if (id != @event.Id)
             {
                 return NotFound();
@@ -157,7 +164,8 @@ namespace HomeBudget.Controllers
         // GET: Event123/GetEvents
         public async Task<IActionResult> GetEvents()
         {
-            var events = await _context.Events.ToListAsync();
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            var events = await _context.Events.Where(x => x.UserId == currentUserId).ToListAsync();
             return Json(events);
         }
 
@@ -165,6 +173,9 @@ namespace HomeBudget.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEvent([FromBody] Event @event)
         {
+            @event.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(@event);
+
             if (ModelState.IsValid)
             {
                 _context.Add(@event);

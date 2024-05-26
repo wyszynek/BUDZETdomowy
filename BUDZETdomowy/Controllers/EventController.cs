@@ -55,10 +55,12 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Start,End")] Event @event)
+        public async Task<IActionResult> Create([Bind("Id,Title,Start,End,IsCompleted")] Event @event)
         {
             @event.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(@event);
+
+            @event.IsCompleted = "No";
 
             if (ModelState.IsValid)
             {
@@ -90,7 +92,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Start,End")] Event @event)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Start,End,IsCompleted")] Event @event)
         {
             @event.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(@event);

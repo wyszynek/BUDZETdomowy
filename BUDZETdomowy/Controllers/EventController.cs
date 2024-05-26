@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HomeBudget.Data;
 using HomeBudget.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HomeBudget.Controllers
 {
+    [Authorize]
     public class EventController : Controller
     {
         private readonly ApplicationDbContext _context;

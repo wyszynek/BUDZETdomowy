@@ -13,30 +13,47 @@
     <meta charset='utf-8' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.13/index.global.min.js'></script>
     <script>
+        //DOMContentLoaded to zdarzenie ktore jest wywolywane gdy poczatkowy dokument HTML zostanie calkowicie zaladowany
         document.addEventListener('DOMContentLoaded', function () {
+            //znajduje element HTML z id calendar
             var calendarEl = document.getElementById('calendar');
+
+            //nowa instancja kalendarza FullCalendar i przypisanie do calendarEl
             var calendar = new FullCalendar.Calendar(calendarEl, {
+
+                //widok kalendarza na siatke miesieczna
                 initialView: 'dayGridMonth',
+
+                //endpoint z ktorego kalendarz pobiera wydarzenia
                 events: '/Event/GetEvents',
+
+                //dateclick poniekad nie uzywamy bo tylko zczytujemy z jsona to co uzytkownik stworzyl recznie
                 dateClick: function (info) {
                     //var title = prompt('Enter Event Title:');
                     //var startDate = info.dateStr;
 
+                    //nowa wartosc ktora zostanie wyswietlona w kalendarzu
                     if (title) {
                         var eventData = {
                             title: title,
                             start: startDate
                         };
 
+                        //pobranie wartosci stworzonych z JSON, fetch (wykonywanie żądań HTML)
                         fetch('/Event/CreateEvent', {
                             method: 'POST',
                             headers: {
+                                //dane wysyłane w ciele żądania są w formacie JSON. Serwer używa tego nagłówka do rozpoznania typu danych w ciele żądania
                                 'Content-Type': 'application/json'
                             },
+
+                            //body zawiera dane ktore maja byc wyslane do serwera
+
                             body: JSON.stringify(eventData)
                         })
                             .then(response => response.json())
                             .then(data => {
+                                //dodanie wydarzenia do kalendarza
                                 if (data.id) {
                                     calendar.addEvent({
                                         id: data.id,

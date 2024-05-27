@@ -62,7 +62,8 @@ namespace HomeBudget.Controllers
             };
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), properties);
-
+            TempData["ToastrMessage"] = "Logged successfully";
+            TempData["ToastrType"] = "success";
             return RedirectToAction("Index", "Home");
             
         }

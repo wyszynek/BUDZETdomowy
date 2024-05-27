@@ -69,10 +69,13 @@ namespace HomeBudget.Controllers
             await TryUpdateModelAsync(notepad);
             if (ModelState.IsValid)
             {
+                TempData["ToastrMessage"] = "Note has been created successfully";
+                TempData["ToastrType"] = "success";
                 _context.Add(notepad);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(notepad);
         }
 
@@ -125,6 +128,8 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
+                TempData["ToastrMessage"] = "Note has been created successfully";
+                TempData["ToastrType"] = "info";
                 return RedirectToAction(nameof(Index));
             }
             return View(notepad);
@@ -159,6 +164,8 @@ namespace HomeBudget.Controllers
                 _context.Notepad.Remove(notepad);
             }
 
+            TempData["ToastrMessage"] = "Note has been deleted successfully";
+            TempData["ToastrType"] = "warning";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

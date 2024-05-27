@@ -75,6 +75,8 @@ namespace HomeBudget.Controllers
 
             if (ModelState.IsValid)
             {
+                TempData["ToastrMessage"] = "Emergency fund has been created successfully";
+                TempData["ToastrType"] = "success";
                 _context.Add(account);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -103,6 +105,8 @@ namespace HomeBudget.Controllers
 
             if (ModelState.IsValid)
             {
+                TempData["ToastrMessage"] = "Account has been created successfully";
+                TempData["ToastrType"] = "success";
                 _context.Add(account);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -175,6 +179,9 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
+
+                TempData["ToastrMessage"] = "Account has been edited successfully";
+                TempData["ToastrType"] = "info";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -213,6 +220,8 @@ namespace HomeBudget.Controllers
                 _context.Accounts.Remove(account);
             }
 
+            TempData["ToastrMessage"] = "Account has been deleted successfully";
+            TempData["ToastrType"] = "warning";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

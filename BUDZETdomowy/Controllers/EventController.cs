@@ -66,6 +66,8 @@ namespace HomeBudget.Controllers
 
             if (ModelState.IsValid)
             {
+                TempData["ToastrMessage"] = "Event has been created successfully";
+                TempData["ToastrType"] = "success";
                 _context.Add(@event);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -122,6 +124,8 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
+                TempData["ToastrMessage"] = "Budget has been edited successfully";
+                TempData["ToastrType"] = "info";
                 return RedirectToAction(nameof(Index));
             }
             return View(@event);
@@ -156,6 +160,8 @@ namespace HomeBudget.Controllers
                 _context.Events.Remove(@event);
             }
 
+            TempData["ToastrMessage"] = "Budget has been deleted successfully";
+            TempData["ToastrType"] = "warning";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -175,7 +181,7 @@ namespace HomeBudget.Controllers
 
         // POST: Event/CreateEvent
         [HttpPost]
-        public async Task<IActionResult> CreateEvent([FromBody] Event @event)
+        public async Task<IActionResult> CreateEvent([FromBody] Event @event) //[FromBody] informuje framework ze wartosc parametru @event ma byc odczytana z ciala żądania HTTP
         {
             @event.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(@event);

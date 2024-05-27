@@ -1,11 +1,9 @@
-﻿<!--inject wstrzykuje zaleznosci, Microsoft... to interfejs dostarczajacy 
+﻿<!--inject wstrzykuje zaleznosci, Microsoft... to interfejs dostarczajacy
 dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy implementacje interfejsu-->
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-j7epO/FFl//egs56vzSDJmZFet5tnrwiIvv98JUBz1p/6e1sOBr1Hd1fJGpzBk29fTpF9ZvMmmJnXnJlr9K/WA==" crossorigin="anonymous" />
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +11,8 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HomeBudget.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-j7epO/FFl//egs56vzSDJmZFet5tnrwiIvv98JUBz1p/6e1sOBr1Hd1fJGpzBk29fTpF9ZvMmmJnXnJlr9K/WA==" crossorigin="anonymous" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 </head>
 
 <!--w tym body dajemy dostep korzystania z theme-->
@@ -58,6 +58,33 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var toastrMessage = '@TempData["ToastrMessage"]';
+            var toastrType = '@TempData["ToastrType"]';
+
+            if (toastrMessage) {
+                switch (toastrType) {
+                    case 'success':
+                        toastr.success(toastrMessage);
+                        break;
+                    case 'error':
+                        toastr.error(toastrMessage);
+                        break;
+                    case 'info':
+                        toastr.info(toastrMessage);
+                        break;
+                    case 'warning':
+                        toastr.warning(toastrMessage);
+                        break;
+                    default:
+                        toastr.info(toastrMessage);
+                        break;
+                }
+            }
+        });
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

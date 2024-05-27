@@ -65,6 +65,8 @@ namespace HomeBudget.Controllers
 
             if (ModelState.IsValid)
             {
+                TempData["ToastrMessage"] = "Category has been created successfully";
+                TempData["ToastrType"] = "success";
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -121,6 +123,8 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
+                TempData["ToastrMessage"] = "Category has been edited successfully";
+                TempData["ToastrType"] = "info";
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -155,6 +159,8 @@ namespace HomeBudget.Controllers
                 _context.Categories.Remove(category);
             }
 
+            TempData["ToastrMessage"] = "Category has been deleted successfully";
+            TempData["ToastrType"] = "warning";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

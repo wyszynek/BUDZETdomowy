@@ -65,6 +65,8 @@ namespace HomeBudget.Controllers
             if (ModelState.IsValid)
             {
                 sourceOfIncome.Ratio = CalculateRatio(sourceOfIncome);
+                TempData["ToastrMessage"] = "Source has been created successfully";
+                TempData["ToastrType"] = "success";
                 _context.Add(sourceOfIncome);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -124,6 +126,9 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
+
+                TempData["ToastrMessage"] = "Source has been edited successfully";
+                TempData["ToastrType"] = "info";
                 return RedirectToAction(nameof(Index));
             }
             PopulateEnums();
@@ -159,6 +164,8 @@ namespace HomeBudget.Controllers
                 _context.SourceOfIncomes.Remove(sourceOfIncome);
             }
 
+            TempData["ToastrMessage"] = "Source has been deleted successfully";
+            TempData["ToastrType"] = "warning";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

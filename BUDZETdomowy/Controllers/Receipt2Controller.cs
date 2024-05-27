@@ -75,6 +75,8 @@ namespace HomeBudget.Controllers
                     }
                 }
 
+                TempData["ToastrMessage"] = "Receipt has been created successfully";
+                TempData["ToastrType"] = "success";
                 _context.Add(receipt2);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -149,6 +151,9 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
+
+                TempData["ToastrMessage"] = "Receipt has been edited successfully";
+                TempData["ToastrType"] = "info";
                 return RedirectToAction(nameof(Index));
             }
             return View(receipt2);
@@ -183,6 +188,8 @@ namespace HomeBudget.Controllers
                 _context.Receipts2.Remove(receipt2);
             }
 
+            TempData["ToastrMessage"] = "Receipt has been deleted successfully";
+            TempData["ToastrType"] = "warning";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

@@ -154,9 +154,10 @@ namespace HomeBudget.Controllers
                         senderAccount.Income -= senderCurrencyExchange;
 
                         _context.Add(transactionBetweenAccounts);
-
                         await _context.SaveChangesAsync();
 
+                        TempData["ToastrMessage"] = "Transaction has been created successfully";
+                        TempData["ToastrType"] = "success";
                         return RedirectToAction(nameof(Index));
                     }
                     else
@@ -249,6 +250,9 @@ namespace HomeBudget.Controllers
 
                                 _context.Update(transactionBetweenAccounts);
                                 await _context.SaveChangesAsync();
+
+                                TempData["ToastrMessage"] = "Transaction has been edited successfully";
+                                TempData["ToastrType"] = "info";
                                 return RedirectToAction(nameof(Index));
                             }
                             else
@@ -334,6 +338,8 @@ namespace HomeBudget.Controllers
             {
                 _context.TransactionBetweenAccounts.Remove(transactionBetweenAccounts);
                 await _context.SaveChangesAsync();
+                TempData["ToastrMessage"] = "Transaction has been deleted successfully";
+                TempData["ToastrType"] = "warning";
             }
             catch (DbUpdateConcurrencyException)
             {

@@ -215,14 +215,28 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var account = await _context.Accounts.FindAsync(id);
-            if (account != null)
+            if (account == null)
             {
-                _context.Accounts.Remove(account);
+                return NotFound();
             }
 
-            TempData["ToastrMessage"] = "Account has been deleted successfully";
+            // Find and delete any transactions where the account is either the sender or recipient
+            var relatedTransactions = await _context.TransactionBetweenAccounts
+                .Where(t => t.SenderId == id || t.RecipientId == id)
+                .ToListAsync();
+
+            if (relatedTransactions.Any())
+            {
+                _context.TransactionBetweenAccounts.RemoveRange(relatedTransactions);
+            }
+
+            _context.Accounts.Remove(account);
+
+            TempData["ToastrMessage"] = "Account and associated transactions have been deleted successfully";
             TempData["ToastrType"] = "warning";
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

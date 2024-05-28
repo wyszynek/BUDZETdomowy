@@ -14,13 +14,13 @@ namespace HomeBudget.Data
                 .HasOne(t => t.SenderAccount)
                 .WithMany()
                 .HasForeignKey(t => t.SenderId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TransactionBetweenAccounts>()
                 .HasOne(t => t.RecipientAccount)
                 .WithMany()
                 .HasForeignKey(t => t.RecipientId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TransactionBetweenAccounts>()
                 .HasOne(b => b.Currency)
@@ -32,13 +32,13 @@ namespace HomeBudget.Data
                 .HasOne(b => b.Category)
                 .WithMany()
                 .HasForeignKey(b => b.CategoryId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Budget>()
                 .HasOne(b => b.Account)
                 .WithMany()
                 .HasForeignKey(b => b.AccountId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Budget>()
                 .HasOne(b => b.User)
@@ -56,13 +56,13 @@ namespace HomeBudget.Data
                 .HasOne(t => t.Category)
                 .WithMany()
                 .HasForeignKey(t => t.CategoryId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.Account)
                 .WithMany()
                 .HasForeignKey(t => t.AccountId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.Currency)

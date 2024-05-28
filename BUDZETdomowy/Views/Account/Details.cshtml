@@ -6,43 +6,43 @@
 
 <h1 class="display-4">Details</h1>
 
-<div>
-    <h4>Account</h4>
-    <hr />
+<div class="custom-card">
+    <h4 class="custom-card-title">Account</h4>
+    <hr class="custom-divider" />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2 custom-dt">
             Name
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10 custom-dd">
             @Html.DisplayFor(model => model.AccountName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Note)
+        <dt class="col-sm-2 custom-dt">
+            Note
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10 custom-dd">
             @Html.DisplayFor(model => model.Note)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Income)
+        <dt class="col-sm-2 custom-dt">
+            Income
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10 custom-dd">
             @Html.DisplayFor(model => model.Income)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2 custom-dt">
             Expense
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10 custom-dd">
             @Html.DisplayFor(model => model.Expanse)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-2 custom-dt">
             Currency
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-10 custom-dd">
             @Html.DisplayFor(model => model.Currency.Code)
         </dd>
     </dl>
 </div>
-<div>
+<div class="custom-buttons">
     <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>

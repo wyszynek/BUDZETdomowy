@@ -6,9 +6,9 @@
 
 <h1 class="display-4">Details</h1>
 
-<div>
-    <h4>Transaction between accounts</h4>
-    <hr />
+<div class="custom-card">
+    <h4 class="custom-card-title">Transaction between accounts</h4>
+    <hr class="custom-divider" />
     <dl class="row">
         <dt class = "col-sm-2">
             Sender
@@ -48,7 +48,7 @@
         </dd>
     </dl>
 </div>
-<div>
+<div class="custom-buttons">
     <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>

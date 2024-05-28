@@ -55,7 +55,7 @@
                     @Html.DisplayFor(modelItem => item.BudgetName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                    @Html.Raw(item.Category.Icon) @Html.DisplayFor(modelItem => item.Category.CategoryName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Account.AccountName)

@@ -15,7 +15,7 @@ body {
 }
 
 .white-theme {
-    background: linear-gradient(to bottom right, #ffffff, #f8f8f8);
+    background: linear-gradient(to bottom right, #ffffff, #ffff);
     color: #000;
 }
 
@@ -24,6 +24,7 @@ body {
     color: #fff;
 }
 
+przerob na gradient szaro-czarno-niebieski w dark theme i bialo-szaro-niebiesko w white theme
 /* Stylowanie elementów po aktywacji */
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb; /* Cieñ przy fokusowaniu */
@@ -162,4 +163,34 @@ body {
 
 .progress-bar.low {
     background-color: #4caf50;
+}
+
+.custom-card {
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 2px solid; /* Dodajemy obwódkê */
+    transition: border-color 0.3s; /* Dodajemy p³ynne przejœcie koloru */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+    .custom-card.dark-theme {
+        border-color: #222; /* Kolor obwódki dla motywu ciemnego */
+    }
+
+    .custom-card.white-theme {
+        border-color: #fff; /* Kolor obwódki dla motywu jasnego */
+    }
+
+.custom-card-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.custom-dt {
+    font-weight: bold;
+}
+
+.custom-buttons {
+    margin-top: 20px;
 }

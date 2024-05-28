@@ -51,7 +51,8 @@ namespace HomeBudget.Controllers
 
             List<Claim> claims = new List<Claim>()
             {
-                new Claim("Id", user.Id.ToString())
+                new Claim("Id", user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName)
             };
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

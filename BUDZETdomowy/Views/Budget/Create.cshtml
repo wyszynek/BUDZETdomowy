@@ -60,12 +60,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="CreationTime" class="control-label">Start Date</label>
-                <input asp-for="CreationTime" class="form-control" />
+                <input asp-for="CreationTime" class="form-control" asp-format="yyyy-MM-ddTHH:mm" />
                 <span asp-validation-for="CreationTime" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="EndTime" class="control-label">End Date</label>
-                <input asp-for="EndTime" class="form-control" />
+                <input asp-for="EndTime" class="form-control" asp-format="yyyy-MM-ddTHH:mm" />
                 <span asp-validation-for="EndTime" class="text-danger"></span>
             </div>
             <p></p>

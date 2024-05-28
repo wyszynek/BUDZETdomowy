@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HomeBudget.Data;
 using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
+using Azure.Identity;
 
 namespace HomeBudget.Controllers
 {
@@ -62,11 +63,22 @@ namespace HomeBudget.Controllers
         {
             if (ModelState.IsValid)
             {
-                user.Password = UserHelper.HashSHA256(user.Password);
-                _context.Add(user); 
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var existingUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == user.UserName);
+
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError(string.Empty, "This name is already taken.");
+                }
+                else
+                {
+                    user.Password = UserHelper.HashSHA256(user.Password);
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+
             return View(user);
         }
 

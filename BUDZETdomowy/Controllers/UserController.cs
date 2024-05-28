@@ -75,6 +75,9 @@ namespace HomeBudget.Controllers
                     user.Password = UserHelper.HashSHA256(user.Password);
                     _context.Add(user);
                     await _context.SaveChangesAsync();
+
+                    TempData["ToastrMessage"] = "User has been created successfully";
+                    TempData["ToastrType"] = "success";
                     return RedirectToAction(nameof(Index));
                 }
             }

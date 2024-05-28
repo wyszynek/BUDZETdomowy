@@ -31,7 +31,7 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> LogOut()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            TempData["ToastrMessage"] = "Logged out successfully";
+            TempData["ToastrMessage"] = "Logged out";
             TempData["ToastrType"] = "info";
             return RedirectToAction("Index", "Login");
         }

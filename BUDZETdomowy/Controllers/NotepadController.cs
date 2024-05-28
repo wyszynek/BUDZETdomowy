@@ -128,7 +128,7 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
-                TempData["ToastrMessage"] = "Note has been created successfully";
+                TempData["ToastrMessage"] = "Note has been edited successfully";
                 TempData["ToastrType"] = "info";
                 return RedirectToAction(nameof(Index));
             }

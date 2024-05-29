@@ -63,8 +63,7 @@ namespace HomeBudget.Controllers
         {
             if (ModelState.IsValid)
             {
-                var existingUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.UserName == user.UserName);
+                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
 
                 if (existingUser != null)
                 {
@@ -76,6 +75,17 @@ namespace HomeBudget.Controllers
                     _context.Add(user);
                     await _context.SaveChangesAsync();
 
+                    // Dodanie kategorii "Work" dla nowego użytkownika
+                    var workCategory = new Category
+                    {
+                        CategoryName = "Work",
+                        Icon = "&#128184;",
+                        Type = "Income",
+                        UserId = user.Id
+                    };
+                    _context.Add(workCategory);
+                    await _context.SaveChangesAsync();
+
                     TempData["ToastrMessage"] = "User has been created successfully";
                     TempData["ToastrType"] = "success";
                     return RedirectToAction(nameof(Index));
@@ -84,6 +94,7 @@ namespace HomeBudget.Controllers
 
             return View(user);
         }
+
 
         // GET: User/Edit/5
         public async Task<IActionResult> Edit(int? id)

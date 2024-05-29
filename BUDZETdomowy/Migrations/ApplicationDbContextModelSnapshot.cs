@@ -56,7 +56,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Budget", b =>
@@ -101,7 +101,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Budgets");
+                    b.ToTable("Budgets", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Category", b =>
@@ -132,7 +132,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Currency", b =>
@@ -149,7 +149,7 @@ namespace HomeBudget.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("Currencies", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Event", b =>
@@ -181,7 +181,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Notepad", b =>
@@ -209,7 +209,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notepad");
+                    b.ToTable("Notepad", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Receipt2", b =>
@@ -242,7 +242,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Receipts2");
+                    b.ToTable("Receipts2", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.SourceOfIncome", b =>
@@ -279,7 +279,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SourceOfIncomes");
+                    b.ToTable("SourceOfIncomes", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Transaction", b =>
@@ -321,7 +321,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.TransactionBetweenAccounts", b =>
@@ -363,7 +363,7 @@ namespace HomeBudget.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TransactionBetweenAccounts");
+                    b.ToTable("TransactionBetweenAccounts", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.User", b =>
@@ -399,7 +399,7 @@ namespace HomeBudget.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Account", b =>

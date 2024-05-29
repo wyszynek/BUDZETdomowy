@@ -83,10 +83,19 @@ namespace HomeBudget.Controllers
             }
 
             var category = await _context.Categories.FindAsync(id);
+
             if (category == null)
             {
                 return NotFound();
             }
+
+            if (IsSpecialCategory(category) == true)
+            {
+                TempData["ToastrMessage"] = "You cannot edit this category.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(category);
         }
 
@@ -103,6 +112,13 @@ namespace HomeBudget.Controllers
             if (id != category.Id)
             {
                 return NotFound();
+            }
+
+            if (IsSpecialCategory(category) == true)
+            {
+                TempData["ToastrMessage"] = "You cannot edit this category.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction(nameof(Index));
             }
 
             if (ModelState.IsValid)
@@ -145,6 +161,13 @@ namespace HomeBudget.Controllers
                 return NotFound();
             }
 
+            if (IsSpecialCategory(category) == true)
+            {
+                TempData["ToastrMessage"] = "You cannot delete this category.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(category);
         }
 
@@ -154,6 +177,14 @@ namespace HomeBudget.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
+
+            if (IsSpecialCategory(category) == true)
+            {
+                TempData["ToastrMessage"] = "You cannot delete this category.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (category != null)
             {
                 _context.Categories.Remove(category);
@@ -168,6 +199,16 @@ namespace HomeBudget.Controllers
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);
+        }
+
+        private bool IsSpecialCategory(Category category)
+        {
+            if (category.Type == "Income" && category.CategoryName == "Work" && category.Icon == "&#128184;")
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

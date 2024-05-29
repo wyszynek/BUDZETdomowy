@@ -9,6 +9,7 @@ using HomeBudget.Data;
 using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
 using HomeBudget.Migrations;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace HomeBudget.Controllers
 {
@@ -85,6 +86,81 @@ namespace HomeBudget.Controllers
             return View(account);
         }
 
+        // GET: Account/Edit/5
+        public async Task<IActionResult> EditEmergencyFund(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var account = await _context.Accounts.FindAsync(id);
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            PopulateCurrency();
+            return View(account);
+        }
+
+        // POST: Account/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditEmergencyFund(int id, [Bind("AccountId,AccountName,Note,Income,Expanse,CurrencyId")] Account account)
+        {
+            account.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(account);
+
+            if (id != account.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var previousAccount = await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    if (previousAccount != null)
+                    {
+                        var sourceCurrency = await _context.Currencies.FirstAsync(x => x.Id == previousAccount.CurrencyId);
+                        var targetCurrency = await _context.Currencies.FirstAsync(x => x.Id == account.CurrencyId);
+
+                        account.Income = await CurrencyRateHelper.Calculate(account.Income, sourceCurrency.Code, targetCurrency.Code);
+                        account.Expanse = await CurrencyRateHelper.Calculate(account.Expanse, sourceCurrency.Code, targetCurrency.Code);
+
+                        _context.Update(account);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Insufficient funds in the sender's account after editing.");
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!AccountExists(account.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                TempData["ToastrMessage"] = "Account has been edited successfully";
+                TempData["ToastrType"] = "info";
+                return RedirectToAction(nameof(Index));
+            }
+
+            PopulateCurrency();
+            return View(account);
+        }
+
 
         // GET: Account/Create
         public IActionResult Create()
@@ -105,11 +181,30 @@ namespace HomeBudget.Controllers
 
             if (ModelState.IsValid)
             {
-                TempData["ToastrMessage"] = "Account has been created successfully";
-                TempData["ToastrType"] = "success";
-                _context.Add(account);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // Retrieve the existing emergency fund account for the current user
+                var existingAccount = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.UserId == account.UserId &&
+                                              (a.AccountName.ToLower() == "emergency fund" ||
+                                               a.AccountName.ToUpper() == "EMERGENCY FUND"));
+
+                // Convert the new account name to lowercase and uppercase for comparison
+                var lowerCaseAccountName = account.AccountName.ToLower();
+                var upperCaseAccountName = account.AccountName.ToUpper();
+
+                // Check if an emergency fund account already exists for the user and if the new account name matches the emergency fund's name
+                if (existingAccount != null &&
+                   (lowerCaseAccountName == "emergency fund" || upperCaseAccountName == "EMERGENCY FUND"))
+                {
+                    ModelState.AddModelError(string.Empty, "You already have an emergency fund");
+                }
+                else
+                {
+                    TempData["ToastrMessage"] = "Account has been created successfully";
+                    TempData["ToastrType"] = "success";
+                    _context.Add(account);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
             PopulateCurrency();
             return View(account);
@@ -128,6 +223,12 @@ namespace HomeBudget.Controllers
             {
                 return NotFound();
             }
+
+            if (account.AccountName == "Emergency Fund")
+            {
+                return RedirectToAction(nameof(EditEmergencyFund), new { id = id });
+            }
+
             PopulateCurrency();
             return View(account);
         }

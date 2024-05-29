@@ -20,7 +20,7 @@ body {
 }
 
 .dark-theme {
-    background: linear-gradient(to bottom, #444 0%, #222 100%);
+    background: linear-gradient(to bottom, #222 0%, #000 100%);
     color: #fff;
 }
 

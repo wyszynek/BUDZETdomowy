@@ -10,9 +10,10 @@ using HomeBudget.Models;
 using System.Text;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
+using HomeBudget.Migrations;
 
 namespace HomeBudget.Controllers
-{
+{ 
     [Authorize]
     public class TransactionController : Controller
     {
@@ -274,9 +275,6 @@ namespace HomeBudget.Controllers
                 return NotFound();
             }
 
-            var sourceOfIncomes = await _context.SourceOfIncomes.ToListAsync();
-            ViewBag.SourceOfIncomes = new SelectList(sourceOfIncomes, "Id", "Name");
-
             PopulateCategoriesAndAccounts();
             return View(transaction);
         }
@@ -311,6 +309,7 @@ namespace HomeBudget.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             return View(transaction);
         }
 
@@ -333,10 +332,17 @@ namespace HomeBudget.Controllers
                 .Select(c => c.Icon)
                 .FirstOrDefault();
 
+            //if (categoryIcon == "&#128184;")
+            //{
+            //    // Jeśli kategoria jest specjalna, przekieruj użytkownika na inny widok
+            //    return RedirectToAction("EditFundsFromSource", new { id = transaction.Id });
+            //}
+
             if (categoryIcon == "&#128184;")
             {
-                // Jeśli kategoria jest specjalna, przekieruj użytkownika na inny widok
-                return RedirectToAction("EditFundsFromSource", new { id = transaction.Id });
+                TempData["ToastrMessage"] = "You cannot edit this transaction.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction(nameof(Index));
             }
 
             PopulateCategoriesAndAccounts();

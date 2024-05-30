@@ -174,7 +174,6 @@ namespace HomeBudget.Controllers
                 }
             }
 
-            // Jeśli ModelState.IsValid nie jest spełnione lub kategoria "Work" nie została znaleziona, ponownie pobierz dane do widoku i zwróć widok
             PopulateCategoriesAndAccounts();
             return View(viewModel);
         }
@@ -249,11 +248,6 @@ namespace HomeBudget.Controllers
                         TempData["ToastrMessage"] = "Transaction has been created successfully";
                         TempData["ToastrType"] = "success";
                         return RedirectToAction(nameof(Index));
-                    }
-                    else if (categoryType == "Income" && transaction.Category.CategoryName == "Work")
-                    {
-                        // Jeśli kategoria to "Work" i typ to "Income", przekieruj do nowego widoku
-                        return View("NewViewForWorkIncomeCategory", transaction);
                     }
                 }
                 else

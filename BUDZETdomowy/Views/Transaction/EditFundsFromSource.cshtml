@@ -1,42 +1,52 @@
 ﻿@model HomeBudget.Models.Transaction
 
 @{
-    ViewData["Title"] = "Edit Funds From Source";
+    ViewData["Title"] = "Edit Funds from Source";
 }
 
-<h1>Edit Funds From Source</h1>
+<h1>Edit Funds from Source</h1>
 
-<h4>Transaction</h4>
+<h1 class="display-4">Transaction</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="EditFundsFromSource">
+        <form asp-action="EditFundsFromSource" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories"></select>
+                <label asp-for="AccountId" class="control-label">Account</label>
+                <select asp-for="AccountId" class="form-control">
+                    @foreach (var account in ViewBag.Accounts)
+                    {
+                        if (account.Id != 0)
+                        {
+                            string accountInfo = $"{account.AccountName} - {account.Income} {account.Currency.Code}";
+                            <option value="@account.Id">@accountInfo</option>
+                        }
+                        else
+                        {
+                            <option value="@account.Id">@account.AccountName</option>
+                        }
+                    }
+                </select>
             </div>
             <div class="form-group">
-                <label asp-for="AccountId" class="control-label"></label>
-                <select asp-for="AccountId" class="form-control" asp-items="ViewBag.Accounts"></select>
+                <label asp-for="Amount" class="control-label">Amount</label>
+                <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="CurrencyId" class="control-label">Currency</label>
+                <select asp-for="CurrencyId" class="form-control" asp-items="@(new SelectList(ViewBag.Currencies, "Id", "Code"))">
+                </select>
+                <span asp-validation-for="CurrencyId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" class="form-control" />
+                <label asp-for="Date" class="control-label">Date</label>
+                <input asp-for="Date" class="form-control" asp-format="yyyy-MM-ddTHH:mm" />
+                <span asp-validation-for="Date" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CurrencyId" class="control-label"></label>
-                <select asp-for="CurrencyId" class="form-control" asp-items="ViewBag.Currencies"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label asp-for="Note" class="control-label"></label>
-                <input asp-for="Note" class="form-control" />
-            </div>
+            <p></p>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -45,7 +55,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Transaction" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

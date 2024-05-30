@@ -37,15 +37,13 @@
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
+            <p></p>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn btn-primary" style="margin-right: 10px; background-color: #28a745;" /> |
+                <a href="/Login/Index" class="btn btn-secondary" style="margin-left: 10px;">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a href="/Login/Index">Go back</a>
 </div>
 
 @section Scripts {

@@ -27,7 +27,11 @@
                 <select asp-for="CategoryId" class="form-control">
                     @foreach (var category in ViewBag.Categories)
                     {
-                        <option value="@category.Id">@category.CategoryName</option>
+                        if (category.Icon == "&#128184;")
+                        {
+                            string categoryInfo = $"{category.Icon} {category.CategoryName} - {category.Type}";
+                            <option value="@category.Id" data-icon="@category.Icon">@Html.Raw(categoryInfo)</option>
+                        }
                     }
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
@@ -74,7 +78,13 @@
 </div>
 
 <div>
-    <a asp-controller="Transaction" asp-action="Create">Back to List</a>
+    <a asp-controller="Transaction" asp-action="Create">Back to Create</a>
+</div>
+
+<p></p>
+
+<div>
+    <a asp-controller="Transaction" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

@@ -116,12 +116,75 @@ namespace HomeBudget.Controllers
             return View(transaction);
         }
 
+        // GET: AddFundsFromSource
+        public IActionResult AddFundsFromSource()
+        {
+            var viewModel = new TransactionViewModel();
+            PopulateCategoriesAndAccounts();
+            return View(viewModel);
+        }
+
+        // POST: AddFundsFromSource
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddFundsFromSource(TransactionViewModel viewModel)
+        {
+            viewModel.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(viewModel);
+
+            var workCategory = _context.Categories.FirstOrDefault(t => t.CategoryName == "Work" && t.Icon == "&#128184;" && t.Type == "Income" && t.UserId == viewModel.UserId);
+
+            if (ModelState.IsValid)
+            {
+                if (workCategory != null)
+                {
+                    var sourceOfIncome = _context.SourceOfIncomes.FirstOrDefault(s => s.Id == viewModel.SourceOfIncomeId);
+                    var targetAccount = _context.Accounts.FirstOrDefault(s => s.Id == viewModel.AccountId);
+                    var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == viewModel.CurrencyId);
+                    var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
+
+                    if (sourceOfIncome != null && targetAccount != null)
+                    {
+                        var income = sourceOfIncome.Ratio * viewModel.Amount;
+                        var currencyExchange = await CurrencyRateHelper.Calculate(income, transactionCurrency.Code, targetAccountCurrency.Code);
+                        targetAccount.Income += currencyExchange;
+
+                        var transaction = new Transaction
+                        {
+                            CategoryId = workCategory.Id,
+                            AccountId = viewModel.AccountId,
+                            Amount = income,
+                            Date = viewModel.Date,
+                            CurrencyId = viewModel.CurrencyId,
+                            UserId = viewModel.UserId,
+                        };
+
+                        _context.Add(transaction);
+                        await _context.SaveChangesAsync(); 
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Source of income not found.");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Work category not found.");
+                }
+            }
+
+            // Jeśli ModelState.IsValid nie jest spełnione lub kategoria "Work" nie została znaleziona, ponownie pobierz dane do widoku i zwróć widok
+            PopulateCategoriesAndAccounts();
+            return View(viewModel);
+        }
+
+
+
         // GET: Transaction/Create
         public IActionResult Create()
         {
             PopulateCategoriesAndAccounts();
-            //ViewData["AccountId"] = new SelectList(_context.Accounts, "AccountId", "AccountName");
-            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
             return View(new Transaction());
         }
 
@@ -186,6 +249,11 @@ namespace HomeBudget.Controllers
                         TempData["ToastrMessage"] = "Transaction has been created successfully";
                         TempData["ToastrType"] = "success";
                         return RedirectToAction(nameof(Index));
+                    }
+                    else if (categoryType == "Income" && transaction.Category.CategoryName == "Work")
+                    {
+                        // Jeśli kategoria to "Work" i typ to "Income", przekieruj do nowego widoku
+                        return View("NewViewForWorkIncomeCategory", transaction);
                     }
                 }
                 else
@@ -439,6 +507,11 @@ namespace HomeBudget.Controllers
             Account DefaultAccount = new Account() { Id = 0, AccountName = "Choose an Account" };
             userAccounts.Insert(0, DefaultAccount);
             ViewBag.Accounts = userAccounts;
+
+            var userSources = _context.SourceOfIncomes.Where(a => a.UserId == currentUserId).ToList();
+            SourceOfIncome DefaultSource = new SourceOfIncome() { Id = 0, Name = "Choose a Source" };
+            userSources.Insert(0, DefaultSource);
+            ViewBag.SourceOfIncomes = userSources;
 
             var CurrencyCollection = _context.Currencies.ToList();
             Currency DefaultCurrency = new Currency() { Id = 0, Code = "Choose a Currency" };

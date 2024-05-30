@@ -20,8 +20,8 @@
                     {
                         if (category.Id != 0)
                         {
-                            string categoryInfo = $"{category.CategoryName} - {category.Type}";
-                            <option value="@category.Id">@categoryInfo</option>
+                            string categoryInfo = $"{category.Icon} {category.CategoryName} - {category.Type}";
+                            <option value="@category.Id">@Html.Raw(categoryInfo)</option>
                         }
                         else
                         {
@@ -83,5 +83,19 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Nasłuchuj zmian w polu wyboru kategorii
+            $('#CategoryId').change(function () {
+                var selectedIcon = $('#CategoryId option:selected').data('icon');
+
+                // Sprawdź, czy wybrana kategoria zawiera ikonę "&#128184;"
+                if (selectedIcon === '&#128184;') {
+                    // Przekieruj użytkownika do nowego widoku
+                    window.location.href = '/Transaction/EditFundsFromSource';
+                }
+            });
+        });
+    </script>
 }

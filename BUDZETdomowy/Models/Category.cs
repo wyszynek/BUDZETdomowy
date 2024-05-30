@@ -17,7 +17,7 @@ namespace HomeBudget.Models
         public string Icon { get; set; } = "";
 
         [Column(TypeName = "nvarchar(50)")]
-        public string Type { get; set; } = "Expense";
+        public string Type { get; set; }
 
         public int UserId { get; set; }
         public User? User { get; set; }

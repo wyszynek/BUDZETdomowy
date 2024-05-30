@@ -18,14 +18,10 @@
                 <select asp-for="CategoryId" class="form-control">
                     @foreach (var category in ViewBag.Categories)
                     {
-                        if (category.Id != 0)
+                        if (category.CategoryName != "Work" || category.Icon != "&#128184;" || category.Type != "Income")
                         {
                             string categoryInfo = $"{category.Icon} {category.CategoryName} - {category.Type}";
                             <option value="@category.Id">@Html.Raw(categoryInfo)</option>
-                        }
-                        else
-                        {
-                            <option value="@category.Id">@category.CategoryName</option>
                         }
                     }
                 </select>
@@ -83,19 +79,7 @@
 </div>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Nasłuchuj zmian w polu wyboru kategorii
-            $('#CategoryId').change(function () {
-                var selectedIcon = $('#CategoryId option:selected').data('icon');
-
-                // Sprawdź, czy wybrana kategoria zawiera ikonę "&#128184;"
-                if (selectedIcon === '&#128184;') {
-                    // Przekieruj użytkownika do nowego widoku
-                    window.location.href = '/Transaction/EditFundsFromSource';
-                }
-            });
-        });
-    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

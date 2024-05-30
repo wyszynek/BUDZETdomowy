@@ -276,25 +276,66 @@ namespace HomeBudget.Controllers
             }
 
             PopulateCategoriesAndAccounts();
-            return View(transaction);
+            return View(new TransactionViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditFundsFromSource(int id, Transaction transaction)
+        public async Task<IActionResult> EditFundsFromSource(int id, TransactionViewModel viewModel)
         {
-            if (id != transaction.Id)
+            viewModel.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            await TryUpdateModelAsync(viewModel);
+
+            var transaction = await _context.Transactions.FindAsync(id);
+            if (transaction == null)
             {
                 return NotFound();
             }
+
+            var workCategory = _context.Categories.FirstOrDefault(t => t.CategoryName == "Work" && t.Icon == "&#128184;" && t.Type == "Income" && t.UserId == viewModel.UserId);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Zapisz zmiany w transakcji
-                    _context.Update(transaction);
-                    await _context.SaveChangesAsync();
+                    var originalTransaction = await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+                    var originalAccount = await _context.Accounts.FindAsync(originalTransaction.AccountId);
+                    var originalTransactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalTransaction.CurrencyId);
+                    var originalAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == originalAccount.CurrencyId);
+                    var originalCurrencyExchange = await CurrencyRateHelper.Calculate(originalTransaction.Amount, originalTransactionCurrency.Code, originalAccountCurrency.Code);
+
+                    if (originalAccount != null)
+                    {
+                        originalAccount.Income -= originalCurrencyExchange;
+
+                        var sourceOfIncome = _context.SourceOfIncomes.FirstOrDefault(s => s.Id == viewModel.SourceOfIncomeId);
+                        var targetAccount = await _context.Accounts.FindAsync(viewModel.AccountId);
+                        var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == viewModel.CurrencyId);
+                        var targetAccountCurrency = await _context.Currencies.FirstAsync(x => x.Id == targetAccount.CurrencyId);
+
+                        if (workCategory != null)
+                        {
+                            if (sourceOfIncome != null && targetAccount != null)
+                            {
+                                var income = sourceOfIncome.Ratio * viewModel.Amount;
+                                var currencyExchange = await CurrencyRateHelper.Calculate(income, transactionCurrency.Code, targetAccountCurrency.Code);
+                                targetAccount.Income += currencyExchange;
+
+                                //nowe dane
+                                transaction.Amount = income;
+                                transaction.Date = viewModel.Date;
+                                transaction.CategoryId = viewModel.CategoryId;
+                                transaction.AccountId = viewModel.AccountId;
+                                transaction.CurrencyId = viewModel.CurrencyId;
+                                transaction.UserId = viewModel.UserId;
+
+                                _context.Update(transaction);
+                                await _context.SaveChangesAsync();
+
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -307,10 +348,9 @@ namespace HomeBudget.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
 
-            return View(transaction);
+            return View(viewModel);
         }
 
         // GET: Transaction/Edit/5
@@ -332,18 +372,17 @@ namespace HomeBudget.Controllers
                 .Select(c => c.Icon)
                 .FirstOrDefault();
 
-            //if (categoryIcon == "&#128184;")
-            //{
-            //    // Jeśli kategoria jest specjalna, przekieruj użytkownika na inny widok
-            //    return RedirectToAction("EditFundsFromSource", new { id = transaction.Id });
-            //}
-
             if (categoryIcon == "&#128184;")
             {
-                TempData["ToastrMessage"] = "You cannot edit this transaction.";
-                TempData["ToastrType"] = "error";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("EditFundsFromSource", new { id = transaction.Id });
             }
+
+            //if (categoryIcon == "&#128184;")
+            //{
+            //    TempData["ToastrMessage"] = "You cannot edit this transaction.";
+            //    TempData["ToastrType"] = "error";
+            //    return RedirectToAction(nameof(Index));
+            //}
 
             PopulateCategoriesAndAccounts();
             return View(transaction);

@@ -13,6 +13,26 @@
         <form asp-action="EditFundsFromSource" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                <label asp-for="SourceOfIncomeId" class="control-label">Source of Income</label>
+                <select asp-for="SourceOfIncomeId" class="form-control">
+                    @foreach (var source in ViewBag.SourceOfIncomes)
+                    {
+                        <option value="@source.Id">@source.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="SourceOfIncomeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label">Category</label>
+                <select asp-for="CategoryId" class="form-control">
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.Id">@category.CategoryName</option>
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="AccountId" class="control-label">Account</label>
                 <select asp-for="AccountId" class="form-control">
                     @foreach (var account in ViewBag.Accounts)

@@ -4,82 +4,18 @@
     ViewData["Title"] = "Calendar";
 }
 
-<!--ladujemy biblioteke stylizacji-->
 <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 
 <h1 class="display-4">Calendar</h1>
 
-<head>
-    <meta charset='utf-8' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.13/index.global.min.js'></script>
-    <script>
-        //DOMContentLoaded to zdarzenie ktore jest wywolywane gdy poczatkowy dokument HTML zostanie calkowicie zaladowany
-        document.addEventListener('DOMContentLoaded', function () {
-            //znajduje element HTML z id calendar
-            var calendarEl = document.getElementById('calendar');
-
-            //nowa instancja kalendarza FullCalendar i przypisanie do calendarEl
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-
-                //widok kalendarza na siatke miesieczna
-                initialView: 'dayGridMonth',
-
-                //endpoint z ktorego kalendarz pobiera wydarzenia
-                events: '/Event/GetEvents',
-
-                //dateclick poniekad nie uzywamy bo tylko zczytujemy z jsona to co uzytkownik stworzyl recznie
-                dateClick: function (info) {
-                    //var title = prompt('Enter Event Title:');
-                    //var startDate = info.dateStr;
-
-                    //nowa wartosc ktora zostanie wyswietlona w kalendarzu
-                    if (title) {
-                        var eventData = {
-                            title: title,
-                            start: startDate
-                        };
-
-                        //pobranie wartosci stworzonych z JSON, fetch (wykonywanie żądań HTML)
-                        fetch('/Event/CreateEvent', {
-                            method: 'POST',
-                            headers: {
-                                //dane wysyłane w ciele żądania są w formacie JSON. Serwer używa tego nagłówka do rozpoznania typu danych w ciele żądania
-                                'Content-Type': 'application/json'
-                            },
-
-                            //body zawiera dane ktore maja byc wyslane do serwera
-
-                            body: JSON.stringify(eventData)
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                //dodanie wydarzenia do kalendarza
-                                if (data.id) {
-                                    calendar.addEvent({
-                                        id: data.id,
-                                        title: data.title,
-                                        start: data.start
-                                    });
-                                } else {
-                                    alert('Failed to create event');
-                                }
-                            });
-                    }
-                }
-            });
-            calendar.render();
-        });
-    </script>
-</head>
-<body>
-    <div id='calendar'></div>
-</body>
+<div id='calendar'></div>
 
 <p></p>
-
 <p>
-    <a asp-action="Create" class="btn btn-success">Create New</a>
+    <a asp-action="Create" class="btn btn-success">Create new Event</a>
 </p>
+<p></p>
+
 <table class="table" id="transactionsTable">
     <thead>
         <tr>
@@ -99,33 +35,46 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Start)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.End)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsCompleted)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Start)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.End)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsCompleted)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
-<!--uzywamy jQuery aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
 @section Scripts {
-    <!--ladujemy biblioteke ktora dostarcza funkcji do interakcji z tabela-->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.13/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: '/Event/GetEvents',
+                dateClick: function (info) {
+                    // Tutaj możesz umieścić kod obsługujący kliknięcie daty, jeśli chcesz
+                }
+            });
+            calendar.render();
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script>

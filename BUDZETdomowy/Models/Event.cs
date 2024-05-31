@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HomeBudget.Models
 {
@@ -10,6 +11,9 @@ namespace HomeBudget.Models
 
         public DateTime Start { get; set; }
 
+        [Required]
+        [DataType(DataType.DateTime)]
+        [CheckDate(ErrorMessage = "You cannot enter the date in the past!")]
         public DateTime End { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]

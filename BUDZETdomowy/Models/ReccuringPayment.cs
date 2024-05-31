@@ -38,5 +38,8 @@ namespace HomeBudget.Models
         [DataType(DataType.DateTime)]
         [CheckDate(ErrorMessage = "You cannot enter the date in the past!")]
         public DateTime LastPaymentDate { get; set; }
+
+        public int UserId { get; set; }
+        public User? User { get; set; }
     }
 }

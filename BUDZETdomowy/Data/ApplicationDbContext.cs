@@ -82,6 +82,30 @@ namespace HomeBudget.Data
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<ReccuringPayment>()
+                .HasOne(t => t.Account)
+                .WithMany()
+                .HasForeignKey(t => t.AccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReccuringPayment>()
+                .HasOne(t => t.Currency)
+                .WithMany()
+                .HasForeignKey(t => t.CurrencyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReccuringPayment>()
+                .HasOne(t => t.Category)
+                .WithMany()
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReccuringPayment>()
+                .HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<Currency>().HasData(
                 new Currency { Id = 1, Code = "PLN" },
                 new Currency { Id = 2, Code = "EUR" },
@@ -107,5 +131,6 @@ namespace HomeBudget.Data
         public DbSet<Receipt2> Receipts2 { get; set; }
         public DbSet<SourceOfIncome> SourceOfIncomes { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<ReccuringPayment> ReccuringPayments { get; set; }
     }
 }

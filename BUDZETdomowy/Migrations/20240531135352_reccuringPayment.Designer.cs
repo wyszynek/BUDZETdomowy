@@ -4,6 +4,7 @@ using HomeBudget.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeBudget.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240531135352_reccuringPayment")]
+    partial class reccuringPayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -298,9 +301,6 @@ namespace HomeBudget.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
@@ -308,8 +308,6 @@ namespace HomeBudget.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("CurrencyId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ReccuringPayments");
                 });
@@ -603,19 +601,11 @@ namespace HomeBudget.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("HomeBudget.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Account");
 
                     b.Navigation("Category");
 
                     b.Navigation("Currency");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeBudget.Models.Receipt2", b =>

@@ -28,9 +28,18 @@ namespace HomeBudget.Controllers
             DateTime startDate = DateTime.Today.AddDays(-6);
 
             //dane transakcji dla ostatnich 7 dni
-            var transactionsData = await _context.Transactions
-                .Where(t => t.UserId == currentUserId && t.Date >= startDate)
-                .GroupBy(t => t.Date.Date)
+            var transactions = await _context.Transactions
+                .Where(t => t.UserId == currentUserId && t.Date >= startDate).ToListAsync();
+
+            foreach (var transaction in transactions)
+            {
+                var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
+                var transactionCategory = await _context.Categories.FirstAsync(x => x.Id == transaction.CategoryId);
+                transaction.Amount = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, "PLN");
+                transaction.Category = transactionCategory;
+            }
+
+            var transactionsData = transactions.GroupBy(t => t.Date.Date)
                 .Select(g => new
                 {
                     Date = g.Key,
@@ -38,7 +47,7 @@ namespace HomeBudget.Controllers
                     Expense = g.Where(t => t.Category.Type == "Expense").Select(t => t.Amount).Sum()
                 })
                 .OrderBy(g => g.Date)
-                .ToListAsync();
+                .ToList();
 
             //lista dni i brakujące dni w przypadku braku transakcji
             List<DateTime> allDays = Enumerable.Range(0, 7).Select(i => startDate.AddDays(i)).ToList();

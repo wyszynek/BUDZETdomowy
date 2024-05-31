@@ -193,3 +193,9 @@ body {
 .custom-buttons {
     margin-top: 20px;
 }
+
+#calendar {
+    max-width: 1500px;
+    margin: 0 auto;
+    max-height: 800px;
+}

@@ -1,19 +1,23 @@
-﻿<h3>Chart</h3>
-<canvas id="myChart" width="400" height="200"></canvas>
+﻿<h3 class="display-4">Financial Summary</h3>
+<div class="financial-summary">
+    <p>Total Income: <span>@ViewBag.TotalIncome</span></p>
+    <p>Total Expense: <span>@ViewBag.TotalExpense</span></p>
+    <p>Balance: <span>@ViewBag.Balance</span></p>
+</div>
+
+<h3 class="display-4">Income vs Expense</h3>
+<div class="chart-container">
+    <canvas id="myChart" width="400" height="200"></canvas>
+</div>
 
 <p></p>
-<!-- Total Income -->
-<p>(The beginning income is not taken)</p>
-<p>Total Income: @ViewBag.TotalIncome</p>
 
-<!-- Total Expense -->
-<p>Total Expense: @ViewBag.TotalExpense</p>
+<h3 class="display-4">Category Expenses</h3>
+<div class="chart-container">
+    <canvas id="categoryChart" width="50" height="50"></canvas>
+</div>
 
-<!-- Balance -->
-<p>Balance: @ViewBag.Balance</p>
-
-<!-- Recent Transactions -->
-<h2>Recent Transactions</h2>
+<h3 class="display-4">Recent Transactions</h1>
 <table>
     <thead>
         <tr>
@@ -41,41 +45,150 @@
     <script>
         // Dane do wykresu
         var chartData = @Html.Raw(Json.Serialize(ViewBag.ChartData));
+        var categoryExpenses = @Html.Raw(Json.Serialize(ViewBag.CategoryExpenses));
 
         // Przetwarzanie danych do wykresu
         var labels = chartData.map(item => item.label);
         var incomeData = chartData.map(item => item.income);
         var expenseData = chartData.map(item => item.expense);
 
-        // Utwórz wykres
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Income',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1,
-                    data: incomeData
-                }, {
-                    label: 'Expense',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                    data: expenseData
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
+        // Dane do wykresu kołowego
+        var categoryLabels = categoryExpenses.map(item => item.category);
+        var categoryAmounts = categoryExpenses.map(item => item.totalAmount);
+        var colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF8A80', '#DCE775', '#FFD180', '#A1887F', '#80CBC4']; // dodaj więcej kolorów w razie potrzeby
+
+        // Funkcja tworząca wykres
+        function createChart(theme) {
+            var ctx = document.getElementById('myChart').getContext('2d');
+
+            var backgroundColor, borderColor, gridColor, fontColor;
+
+            if (theme === 'dark') {
+                backgroundColor = ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'];
+                borderColor = ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'];
+                gridColor = 'rgba(255, 255, 255, 0.1)';
+                fontColor = '#fff';
+            } else {
+                backgroundColor = ['rgba(54, 162, 235, 0.2)', 'rgba(255, 99, 132, 0.2)'];
+                borderColor = ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'];
+                gridColor = 'rgba(0, 0, 0, 0.1)';
+                fontColor = '#000';
             }
+
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Income',
+                        backgroundColor: backgroundColor[0],
+                        borderColor: borderColor[0],
+                        borderWidth: 2,
+                        data: incomeData,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Expense',
+                        backgroundColor: backgroundColor[1],
+                        borderColor: borderColor[1],
+                        borderWidth: 2,
+                        data: expenseData,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: fontColor
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: fontColor,
+                                beginAtZero: true
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: fontColor
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                            titleColor: theme === 'dark' ? '#fff' : '#000',
+                            bodyColor: theme === 'dark' ? '#fff' : '#000'
+                        }
+                    }
+                }
+            });
+
+            return chart;
+        }
+
+        // Funkcja tworząca wykres kołowy
+        function createCategoryChart(theme) {
+            var ctx = document.getElementById('categoryChart').getContext('2d');
+
+            var backgroundColor = [];
+            var borderColor = [];
+
+            for (var i = 0; i < categoryLabels.length; i++) {
+                var colorIndex = i % colors.length;
+                backgroundColor.push(colors[colorIndex]);
+                borderColor.push('#fff'); // obramowanie każdego segmentu będzie białe
+            }
+
+            var chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'Category Expenses',
+                        backgroundColor: backgroundColor,
+                        borderColor: borderColor,
+                        borderWidth: 1,
+                        data: categoryAmounts
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: theme === 'dark' ? '#fff' : '#000'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                            titleColor: theme === 'dark' ? '#fff' : '#000',
+                            bodyColor: theme === 'dark' ? '#fff' : '#000'
+                        }
+                    }
+                }
+            });
+
+            return chart;
+        }
+
+        // Inicjalizacja wykresów z domyślnym motywem
+        var theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+        var myChart = createChart(theme);
+        var categoryChart = createCategoryChart(theme);
+
+        // Obsługa przełączania motywów
+        document.querySelector('.theme-toggle-btn').addEventListener('click', function () {
+            // kod obsługi przełączania motywów
         });
     </script>
 }

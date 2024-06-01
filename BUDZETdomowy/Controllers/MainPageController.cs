@@ -29,14 +29,14 @@ namespace HomeBudget.Controllers
 
             //dane transakcji dla ostatnich 7 dni
             var transactions = await _context.Transactions
-                .Where(t => t.UserId == currentUserId && t.Date >= startDate).ToListAsync();
+                .Where(t => t.UserId == currentUserId && t.Date >= startDate)
+                .Include(t => t.Category)
+                .ToListAsync();
 
             foreach (var transaction in transactions)
             {
                 var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
-                var transactionCategory = await _context.Categories.FirstAsync(x => x.Id == transaction.CategoryId);
                 transaction.Amount = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, "PLN");
-                transaction.Category = transactionCategory;
             }
 
             var transactionsData = transactions.GroupBy(t => t.Date.Date)
@@ -72,7 +72,6 @@ namespace HomeBudget.Controllers
                 .Take(5)
                 .ToListAsync();
 
-
             decimal totalIncome = await _context.Transactions
                 .Where(t => t.UserId == currentUserId && t.Category.Type == "Income")
                 .SumAsync(t => t.Amount);
@@ -84,6 +83,19 @@ namespace HomeBudget.Controllers
             ViewBag.TotalIncome = totalIncome.ToString("F2");
             ViewBag.TotalExpense = totalExpense.ToString("F2");
             ViewBag.Balance = (totalIncome - totalExpense).ToString("F2");
+
+            // Prepare data for the doughnut chart
+            var categoryExpenses = transactions
+                .Where(t => t.Category.Type == "Expense")
+                .GroupBy(t => t.Category.CategoryName)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    TotalAmount = g.Sum(t => t.Amount)
+                })
+                .ToList();
+
+            ViewBag.CategoryExpenses = categoryExpenses;
 
             return View();
         }

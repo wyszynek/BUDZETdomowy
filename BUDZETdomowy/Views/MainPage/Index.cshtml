@@ -14,7 +14,7 @@
 
 <h3 class="display-4">Category Expenses</h3>
 <div class="chart-container">
-    <canvas id="categoryChart" width="50" height="50"></canvas>
+    <canvas id="categoryChart" width="300" height="150"></canvas>
 </div>
 
 <h3 class="display-4">Recent Transactions</h1>
@@ -137,49 +137,78 @@
         }
 
         // Funkcja tworząca wykres kołowy
-        function createCategoryChart(theme) {
-            var ctx = document.getElementById('categoryChart').getContext('2d');
+            function createCategoryChart(theme) {
+                var ctx = document.getElementById('categoryChart').getContext('2d');
 
-            var backgroundColor = [];
-            var borderColor = [];
-
-            for (var i = 0; i < categoryLabels.length; i++) {
-                var colorIndex = i % colors.length;
-                backgroundColor.push(colors[colorIndex]);
-                borderColor.push('#fff'); // obramowanie każdego segmentu będzie białe
-            }
-
-            var chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: categoryLabels,
-                    datasets: [{
-                        label: 'Category Expenses',
-                        backgroundColor: backgroundColor,
-                        borderColor: borderColor,
-                        borderWidth: 1,
-                        data: categoryAmounts
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: theme === 'dark' ? '#fff' : '#000'
-                            }
+                if (categoryLabels.length === 0) {
+                    // Jeśli nie ma żadnych kategorii, tworzymy pusty wykres
+                    var emptyChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['No Data'],
+                            datasets: [{
+                                data: [1], // Dowolna wartość, aby zachować spójność
+                                backgroundColor: ['#eee'], // Kolor tła dla braku danych
+                                borderWidth: 0 // Bez obramowania
+                            }]
                         },
-                        tooltip: {
-                            backgroundColor: theme === 'dark' ? '#333' : '#fff',
-                            titleColor: theme === 'dark' ? '#fff' : '#000',
-                            bodyColor: theme === 'dark' ? '#fff' : '#000'
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false // Ukryj legendę
+                                },
+                                tooltip: {
+                                    enabled: false // Wyłącz podpowiedzi
+                                }
+                            }
                         }
-                    }
-                }
-            });
+                    });
 
-            return chart;
-        }
+                    return emptyChart;
+                } else {
+                    // Tworzenie wykresu z danymi kategorii
+                    var backgroundColor = [];
+                    var borderColor = [];
+
+                    for (var i = 0; i < categoryLabels.length; i++) {
+                        var colorIndex = i % colors.length;
+                        backgroundColor.push(colors[colorIndex]);
+                        borderColor.push('#fff'); // obramowanie każdego segmentu będzie białe
+                    }
+
+                    var chart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: categoryLabels,
+                            datasets: [{
+                                label: 'Category Expenses',
+                                backgroundColor: backgroundColor,
+                                borderColor: borderColor,
+                                borderWidth: 1,
+                                data: categoryAmounts
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: theme === 'dark' ? '#fff' : '#000'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                                    titleColor: theme === 'dark' ? '#fff' : '#000',
+                                    bodyColor: theme === 'dark' ? '#fff' : '#000'
+                                }
+                            }
+                        }
+                    });
+
+                    return chart;
+                }
+            }
 
         // Inicjalizacja wykresów z domyślnym motywem
         var theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';

@@ -1,4 +1,6 @@
-﻿using HomeBudget.Models.Enum;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using HomeBudget.Models.Enum;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,7 +32,7 @@ namespace HomeBudget.Models
         public int CurrencyId { get; set; }
         public Currency? Currency { get; set; }
 
-        public Time HowOften { get; set; }
+        public ReccuringPaymentFrequency HowOften { get; set; }
 
         public DateTime FirstPaymentDate { get; set; }
 
@@ -41,5 +43,8 @@ namespace HomeBudget.Models
 
         public int UserId { get; set; }
         public User? User { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? LastSuccessfulPayment { get; set; }
     }
 }

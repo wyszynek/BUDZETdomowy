@@ -1,6 +1,6 @@
 ﻿namespace HomeBudget.Models.Enum
 {
-    public enum Time
+    public enum ReccuringPaymentFrequency
     {
         EveryWeek,
         EveryMounth,

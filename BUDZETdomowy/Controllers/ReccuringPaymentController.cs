@@ -213,7 +213,7 @@ namespace HomeBudget.Controllers
 
         private void PopulateEnums()
         {
-            ViewBag.ContractType = new SelectList(Enum.GetValues(typeof(Time)).Cast<Time>().Select(e => new SelectListItem
+            ViewBag.ContractType = new SelectList(Enum.GetValues(typeof(ReccuringPaymentFrequency)).Cast<ReccuringPaymentFrequency>().Select(e => new SelectListItem
             {
                 Value = ((decimal)e).ToString(),
                 Text = e.ToString()

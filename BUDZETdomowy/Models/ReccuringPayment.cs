@@ -91,24 +91,30 @@ namespace HomeBudget.Models
                     {
                         var currencyExchange = await CurrencyRateHelper.Calculate(payment.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
 
-                        var transaction = new Transaction
+                        if (payment.FirstPaymentDate <= DateTime.Now && payment.LastPaymentDate >= DateTime.Now)
                         {
-                            CategoryId = payment.CategoryId,
-                            AccountId = payment.AccountId,
-                            Amount = payment.Amount,
-                            Note = "Recurring payment",
-                            Date = DateTime.Now,
-                            CurrencyId = payment.CurrencyId,
-                            UserId = payment.UserId
-                        };
+                            if (account.Income >= currencyExchange)
+                            {
+                                var transaction = new Transaction
+                                {
+                                    CategoryId = payment.CategoryId,
+                                    AccountId = payment.AccountId,
+                                    Amount = payment.Amount,
+                                    Note = "Recurring payment",
+                                    Date = DateTime.Now,
+                                    CurrencyId = payment.CurrencyId,
+                                    UserId = payment.UserId
+                                };
 
-                        context.Transactions.Add(transaction);
+                                context.Transactions.Add(transaction);
 
-                        account.Income -= currencyExchange;
-                        account.Expanse += currencyExchange;
-                        payment.LastSuccessfulPayment = currentDate;
-                        context.Update(account);
-                        context.Update(payment);
+                                account.Income -= currencyExchange;
+                                account.Expanse += currencyExchange;
+                                payment.LastSuccessfulPayment = currentDate;
+                                context.Update(account);
+                                context.Update(payment);
+                            }
+                        }
                     }
                 }
 

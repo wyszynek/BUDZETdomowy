@@ -49,7 +49,7 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.Raw(item.Category.Icon) @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                    @Html.DisplayFor(modelItem => item.Category.CategoryName) @Html.Raw(item.Category.Icon)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Account.AccountName)

@@ -377,12 +377,12 @@ namespace HomeBudget.Controllers
                 return RedirectToAction("EditFundsFromSource", new { id = transaction.Id });
             }
 
-            //if (categoryIcon == "&#128184;")
-            //{
-            //    TempData["ToastrMessage"] = "You cannot edit this transaction.";
-            //    TempData["ToastrType"] = "error";
-            //    return RedirectToAction(nameof(Index));
-            //}
+            if (categoryIcon == "&#128257;")
+            {
+                TempData["ToastrMessage"] = "You cannot edit this transaction.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction(nameof(Index));
+            }
 
             PopulateCategoriesAndAccounts();
             return View(transaction);
@@ -402,6 +402,18 @@ namespace HomeBudget.Controllers
             if (id != transaction.Id)
             {
                 return NotFound();
+            }
+
+            var categoryIcon = _context.Categories
+                .Where(c => c.Id == transaction.CategoryId)
+                .Select(c => c.Icon)
+                .FirstOrDefault();
+
+            if (categoryIcon == "&#128257;")
+            {
+                TempData["ToastrMessage"] = "You cannot edit this transaction.";
+                TempData["ToastrType"] = "error";
+                return RedirectToAction(nameof(Index));
             }
 
             if (ModelState.IsValid)
@@ -603,7 +615,7 @@ namespace HomeBudget.Controllers
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
-            var userCategories = _context.Categories.Where(c => c.UserId == currentUserId).ToList();
+            var userCategories = _context.Categories.Where(c => c.UserId == currentUserId && c.Icon != "&#128257;").ToList();
             Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
             userCategories.Insert(0, DefaultCategory);
             ViewBag.Categories = userCategories;
@@ -622,6 +634,16 @@ namespace HomeBudget.Controllers
             Currency DefaultCurrency = new Currency() { Id = 0, Code = "Choose a Currency" };
             CurrencyCollection.Insert(0, DefaultCurrency);
             ViewBag.Currencies = CurrencyCollection;
+        }
+
+        private bool IsSpecialCategory(Category category)
+        {
+            if (category.Type == "Expense" && category.CategoryName == "Reccuring Payment" && category.Icon == "&#128257;")
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

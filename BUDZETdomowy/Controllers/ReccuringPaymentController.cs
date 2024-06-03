@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HomeBudget.Data;
 using HomeBudget.Models;
 using HomeBudget.Models.Enum;
+using HomeBudget.Migrations;
 
 namespace HomeBudget.Controllers
 {
@@ -66,9 +67,11 @@ namespace HomeBudget.Controllers
         {
             reccuringPayment.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(reccuringPayment);
+            var reccuringPaymentCategory = _context.Categories.FirstOrDefault(t => t.CategoryName == "Reccuring Payment" && t.Icon == "&#128257;" && t.Type == "Expense" && t.UserId == reccuringPayment.UserId);
 
             if (ModelState.IsValid)
             {
+                reccuringPayment.Category = reccuringPaymentCategory;
                 TempData["ToastrMessage"] = "Reccuring payment has been created successfully";
                 TempData["ToastrType"] = "success";
                 _context.Add(reccuringPayment);
@@ -190,7 +193,7 @@ namespace HomeBudget.Controllers
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
 
-            var userCategories = _context.Categories.Where(c => c.UserId == currentUserId).ToList();
+            var userCategories = _context.Categories.Where(c => c.UserId == currentUserId && c.Type == "Expense").ToList();
             Category DefaultCategory = new Category() { Id = 0, CategoryName = "Choose a Category" };
             userCategories.Insert(0, DefaultCategory);
             ViewBag.Categories = userCategories;

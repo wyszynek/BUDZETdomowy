@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
 using HomeBudget.Data;
 using HomeBudget.Models.Enum;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -83,8 +84,13 @@ namespace HomeBudget.Models
                 foreach (var payment in payments)
                 {
                     var account = context.Accounts.Find(payment.AccountId);
+                    var transactionCurrency = await context.Currencies.FirstAsync(x => x.Id == payment.CurrencyId);
+                    var targetAccountCurrency = await context.Currencies.FirstAsync(x => x.Id == account.CurrencyId);
+
                     if (account != null)
                     {
+                        var currencyExchange = await CurrencyRateHelper.Calculate(payment.Amount, transactionCurrency.Code, targetAccountCurrency.Code);
+
                         var transaction = new Transaction
                         {
                             CategoryId = payment.CategoryId,
@@ -98,8 +104,8 @@ namespace HomeBudget.Models
 
                         context.Transactions.Add(transaction);
 
-                        account.Income -= payment.Amount;
-                        account.Expanse += payment.Amount;
+                        account.Income -= currencyExchange;
+                        account.Expanse += currencyExchange;
                         payment.LastSuccessfulPayment = currentDate;
                         context.Update(account);
                         context.Update(payment);

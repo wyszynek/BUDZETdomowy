@@ -72,13 +72,13 @@ namespace HomeBudget.Controllers
                 .Take(5)
                 .ToListAsync();
 
-            decimal totalIncome = await _context.Transactions
+            decimal totalIncome = transactions
                 .Where(t => t.UserId == currentUserId && t.Category.Type == "Income")
-                .SumAsync(t => t.Amount);
+                .Sum(t => t.Amount);
 
-            decimal totalExpense = await _context.Transactions
+            decimal totalExpense = transactions
                 .Where(t => t.UserId == currentUserId && t.Category.Type == "Expense")
-                .SumAsync(t => t.Amount);
+                .Sum(t => t.Amount);
 
             ViewBag.TotalIncome = totalIncome.ToString("F2");
             ViewBag.TotalExpense = totalExpense.ToString("F2");

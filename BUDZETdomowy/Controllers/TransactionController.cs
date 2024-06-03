@@ -635,15 +635,5 @@ namespace HomeBudget.Controllers
             CurrencyCollection.Insert(0, DefaultCurrency);
             ViewBag.Currencies = CurrencyCollection;
         }
-
-        private bool IsSpecialCategory(Category category)
-        {
-            if (category.Type == "Expense" && category.CategoryName == "Reccuring Payment" && category.Icon == "&#128257;")
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 }

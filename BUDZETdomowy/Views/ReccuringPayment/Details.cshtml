@@ -1,14 +1,14 @@
 ﻿@model HomeBudget.Models.ReccuringPayment
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Payment details";
 }
 
-<h1>Details</h1>
+<h1 class="display-4">Details</h1>
 
-<div>
-    <h4>ReccuringPayment</h4>
-    <hr />
+<div class="custom-card">
+    <h4 class="custom-card-title">Reccuring Payment</h4>
+    <hr class="custom-divider" />
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
@@ -20,7 +20,7 @@
             @Html.DisplayNameFor(model => model.Category)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.CategoryName)
+            @Html.Raw(Model.Category.Icon) @Html.DisplayFor(model => model.Category.CategoryName)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Account)
@@ -41,26 +41,32 @@
             @Html.DisplayFor(model => model.Currency.Id)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HowOften)
+            How Often
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.HowOften)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstPaymentDate)
+            First Payment
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.FirstPaymentDate)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastPaymentDate)
+            Last Payment
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.LastPaymentDate)
         </dd>
+        <dt class="col-sm-2">
+            Recent Payment
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LastSuccessfulPayment)
+        </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="custom-buttons">
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary" style="margin-right: 10px;">Edit</a> |
+    <a asp-action="Index" class="btn btn-secondary" style="margin-left: 10px;">Back to List</a>
 </div>

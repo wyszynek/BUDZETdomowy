@@ -1,8 +1,17 @@
-﻿<h3 class="display-4">Financial Summary</h3>
+﻿@model HomeBudget.Models.MainPageViewModel
+
+<h3 class="display-4">Financial Summary</h3>
 <div class="financial-summary">
     <p>Total Income: <span>@ViewBag.TotalIncome</span></p>
     <p>Total Expense: <span>@ViewBag.TotalExpense</span></p>
     <p>Balance: <span>@ViewBag.Balance</span></p>
+</div>
+
+<div>
+    <label asp-for="CurrencyId" class="control-label">Change currency</label>
+    <select asp-for="CurrencyId" class="form-control" asp-items="@(new SelectList(ViewBag.Currencies, "Id", "Code"))">
+    </select>
+    <span asp-validation-for="CurrencyId" class="text-danger"></span>
 </div>
 
 <h3 class="display-4">Income vs Expense</h3>

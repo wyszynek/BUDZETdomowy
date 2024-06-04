@@ -20,16 +20,17 @@ namespace HomeBudget.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(MainPageViewModel mainPageViewModel)
         {
-            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            mainPageViewModel.UserId = UserHelper.GetCurrentUserId(HttpContext);
+            PopulateCurrency();
 
             //data początkowa (7 dni wstecz)
             DateTime startDate = DateTime.Today.AddDays(-6);
 
             //dane transakcji dla ostatnich 7 dni
             var transactions = await _context.Transactions
-                .Where(t => t.UserId == currentUserId && t.Date >= startDate)
+                .Where(t => t.UserId == mainPageViewModel.UserId && t.Date >= startDate)
                 .Include(t => t.Category)
                 .ToListAsync();
 
@@ -67,17 +68,17 @@ namespace HomeBudget.Controllers
 
             ViewBag.RecentTransactions = await _context.Transactions
                 .Include(i => i.Category)
-                .Where(t => t.UserId == currentUserId)
+                .Where(t => t.UserId == mainPageViewModel.UserId)
                 .OrderByDescending(j => j.Date)
                 .Take(5)
                 .ToListAsync();
 
             decimal totalIncome = transactions
-                .Where(t => t.UserId == currentUserId && t.Category.Type == "Income")
+                .Where(t => t.UserId == mainPageViewModel.UserId && t.Category.Type == "Income")
                 .Sum(t => t.Amount);
 
             decimal totalExpense = transactions
-                .Where(t => t.UserId == currentUserId && t.Category.Type == "Expense")
+                .Where(t => t.UserId == mainPageViewModel.UserId && t.Category.Type == "Expense")
                 .Sum(t => t.Amount);
 
             ViewBag.TotalIncome = totalIncome.ToString("F2");
@@ -97,7 +98,13 @@ namespace HomeBudget.Controllers
 
             ViewBag.CategoryExpenses = categoryExpenses;
 
-            return View();
+            return View(mainPageViewModel);
+        }
+
+        public void PopulateCurrency()
+        {
+            var CurrencyCollection = _context.Currencies.ToList();
+            ViewBag.Currencies = CurrencyCollection;
         }
     }
 }

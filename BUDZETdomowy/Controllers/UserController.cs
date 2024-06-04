@@ -85,17 +85,6 @@ namespace HomeBudget.Controllers
                     };
                     _context.Add(workCategory);
 
-                    var reccuringPaymentCategory = new Category
-                    {
-                        CategoryName = "Reccuring Payment",
-                        Icon = "&#128257;",
-                        Type = "Expense",
-                        UserId = user.Id
-                    };
-                    _context.Add(reccuringPaymentCategory);
-
-                    await _context.SaveChangesAsync();
-
                     TempData["ToastrMessage"] = "User has been created successfully";
                     TempData["ToastrType"] = "success";
                     return RedirectToAction(nameof(Index));

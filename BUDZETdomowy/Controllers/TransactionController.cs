@@ -377,13 +377,6 @@ namespace HomeBudget.Controllers
                 return RedirectToAction("EditFundsFromSource", new { id = transaction.Id });
             }
 
-            if (categoryIcon == "&#128257;")
-            {
-                TempData["ToastrMessage"] = "You cannot edit this transaction.";
-                TempData["ToastrType"] = "error";
-                return RedirectToAction(nameof(Index));
-            }
-
             PopulateCategoriesAndAccounts();
             return View(transaction);
         }
@@ -408,13 +401,6 @@ namespace HomeBudget.Controllers
                 .Where(c => c.Id == transaction.CategoryId)
                 .Select(c => c.Icon)
                 .FirstOrDefault();
-
-            if (categoryIcon == "&#128257;")
-            {
-                TempData["ToastrMessage"] = "You cannot edit this transaction.";
-                TempData["ToastrType"] = "error";
-                return RedirectToAction(nameof(Index));
-            }
 
             if (ModelState.IsValid)
             {

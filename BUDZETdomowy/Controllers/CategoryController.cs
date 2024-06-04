@@ -203,7 +203,7 @@ namespace HomeBudget.Controllers
 
         private bool IsSpecialCategory(Category category)
         {
-            if ((category.Type == "Income" && category.CategoryName == "Work" && category.Icon == "&#128184;") || (category.Type == "Expense" && category.CategoryName == "Reccuring Payment" && category.Icon == "&#128257;"))
+            if (category.Type == "Income" && category.CategoryName == "Work" && category.Icon == "&#128184;")
             {
                 return true;
             }

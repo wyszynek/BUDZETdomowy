@@ -20,8 +20,15 @@
                     {
                         if (category.CategoryName != "Work" || category.Icon != "&#128184;" || category.Type != "Income")
                         {
-                            string categoryInfo = $"{category.Icon} {category.CategoryName} - {category.Type}";
-                            <option value="@category.Id">@Html.Raw(categoryInfo)</option>
+                            if (category.Id == 0)
+                            {
+                                <option value="@category.Id" data-icon="@category.Icon">@category.CategoryName</option>
+                            }
+                            else
+                            {
+                                string categoryInfo = $"{category.Icon} {category.CategoryName} - {category.Type}";
+                                <option value="@category.Id">@Html.Raw(categoryInfo)</option>
+                            }
                         }
                     }
                 </select>

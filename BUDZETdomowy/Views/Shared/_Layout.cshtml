@@ -21,7 +21,7 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Home Budget</a>
+                <a class="navbar-brand" asp-area="" asp-controller="MainPage" asp-action="Index">Home Budget</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -59,11 +59,45 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
         </nav>
     </header>
 
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Index">Accounts</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="Category" asp-action="Index">Categories</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="Budget" asp-action="Index">Budgets</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="SourceOfIncome" asp-action="Index">Sources of income</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="Transaction" asp-action="Index">Transactions</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="TransactionBetweenAccounts" asp-action="Index">Transaction between accounts</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="Notepad" asp-action="Index">Notepad</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="Receipt2" asp-action="Index">Receipts</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="Event" asp-action="Index">Events</a>
+            <a class="nav-link text-white" asp-area="" asp-controller="ReccuringPayment" asp-action="Index">Reccuring payments</a>
+        </div>
+    }
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+    }
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+
+    <script>
+        /* Function to open Slide Out Navigation */
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+        }
+
+        /* Function to close Slide Out Navigation */
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
+    </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

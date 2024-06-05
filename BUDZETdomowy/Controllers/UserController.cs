@@ -75,7 +75,6 @@ namespace HomeBudget.Controllers
                     _context.Add(user);
                     await _context.SaveChangesAsync();
 
-                    // Dodanie kategorii "Work" dla nowego użytkownika
                     var workCategory = new Category
                     {
                         CategoryName = "Work",
@@ -84,6 +83,8 @@ namespace HomeBudget.Controllers
                         UserId = user.Id
                     };
                     _context.Add(workCategory);
+
+                    await _context.SaveChangesAsync();
 
                     TempData["ToastrMessage"] = "User has been created successfully";
                     TempData["ToastrType"] = "success";

@@ -25,26 +25,27 @@ namespace HomeBudget.Controllers
         // GET: User
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
+            return View(await _context.Users.Where(x => x.Id == currentUserId).ToListAsync());
         }
 
-        // GET: User/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //// GET: User/Details/5
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //    var user = await _context.Users
+        //        .FirstOrDefaultAsync(m => m.Id == id);
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(user);
-        }
+        //    return View(user);
+        //}
 
         [AllowAnonymous]
         // GET: User/Create
@@ -64,10 +65,15 @@ namespace HomeBudget.Controllers
             if (ModelState.IsValid)
             {
                 var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
+                var existingEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
 
                 if (existingUser != null)
                 {
                     ModelState.AddModelError(string.Empty, "This name is already taken.");
+                }
+                else if (existingEmail != null)
+                {
+                    ModelState.AddModelError(string.Empty, "This email is already used.");
                 }
                 else
                 {

@@ -22,7 +22,7 @@ namespace HomeBudget.Controllers
             ClaimsPrincipal claimUser = HttpContext.User;
             if (claimUser.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "MainPage");
             }
 
             return View();
@@ -65,7 +65,7 @@ namespace HomeBudget.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), properties);
             TempData["ToastrMessage"] = "Logged successfully";
             TempData["ToastrType"] = "success";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "MainPage");
             
         }
     }

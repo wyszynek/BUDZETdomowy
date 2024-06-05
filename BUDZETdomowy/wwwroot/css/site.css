@@ -235,3 +235,7 @@ body {
     font-weight: bold; /* Make the text bold */
     margin-bottom: 10px; /* Add some space below each paragraph */
 }
+
+.text-center h1 {
+    font-family: 'Montserrat', sans-serif;
+}

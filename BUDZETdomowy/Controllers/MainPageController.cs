@@ -34,10 +34,15 @@ namespace HomeBudget.Controllers
                 .Include(t => t.Category)
                 .ToListAsync();
 
+            // Fetch the selected currency
+            var selectedCurrency = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == mainPageViewModel.CurrencyId);
+            var selectedCurrencyCode = selectedCurrency?.Code ?? "PLN"; 
+
+            // Convert transactions to selected currency
             foreach (var transaction in transactions)
             {
                 var transactionCurrency = await _context.Currencies.FirstAsync(x => x.Id == transaction.CurrencyId);
-                transaction.Amount = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, "PLN");
+                transaction.Amount = await CurrencyRateHelper.Calculate(transaction.Amount, transactionCurrency.Code, selectedCurrencyCode);
             }
 
             var transactionsData = transactions.GroupBy(t => t.Date.Date)

@@ -7,12 +7,14 @@
     <p>Balance: <span>@ViewBag.Balance</span></p>
 </div>
 
-<div>
-    <label asp-for="CurrencyId" class="control-label">Change currency</label>
-    <select asp-for="CurrencyId" class="form-control" asp-items="@(new SelectList(ViewBag.Currencies, "Id", "Code"))">
-    </select>
-    <span asp-validation-for="CurrencyId" class="text-danger"></span>
-</div>
+<form method="post" asp-action="Index">
+    <div>
+        <label asp-for="CurrencyId" class="control-label">Change currency</label>
+        <select asp-for="CurrencyId" class="form-control" asp-items="@(new SelectList(ViewBag.Currencies, "Id", "Code"))" onchange="this.form.submit()">
+        </select>
+        <span asp-validation-for="CurrencyId" class="text-danger"></span>
+    </div>
+</form>
 
 <h3 class="display-4">Income vs Expense</h3>
 <div class="chart-container">
@@ -26,7 +28,7 @@
     <canvas id="categoryChart" width="300" height="150"></canvas>
 </div>
 
-<h3 class="display-4">Recent Transactions</h1>
+<h3 class="display-4">Recent Transactions</h3>
 <table>
     <thead>
         <tr>
@@ -52,21 +54,21 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Dane do wykresu
+        // Data for the charts
         var chartData = @Html.Raw(Json.Serialize(ViewBag.ChartData));
         var categoryExpenses = @Html.Raw(Json.Serialize(ViewBag.CategoryExpenses));
 
-        // Przetwarzanie danych do wykresu
+        // Process data for the line chart
         var labels = chartData.map(item => item.label);
         var incomeData = chartData.map(item => item.income);
         var expenseData = chartData.map(item => item.expense);
 
-        // Dane do wykresu kołowego
+        // Data for the doughnut chart
         var categoryLabels = categoryExpenses.map(item => item.category);
         var categoryAmounts = categoryExpenses.map(item => item.totalAmount);
-        var colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF8A80', '#DCE775', '#FFD180', '#A1887F', '#80CBC4']; // dodaj więcej kolorów w razie potrzeby
+        var colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF8A80', '#DCE775', '#FFD180', '#A1887F', '#80CBC4']; // Add more colors if needed
 
-        // Funkcja tworząca wykres
+        // Function to create the line chart
         function createChart(theme) {
             var ctx = document.getElementById('myChart').getContext('2d');
 
@@ -145,88 +147,88 @@
             return chart;
         }
 
-        // Funkcja tworząca wykres kołowy
-            function createCategoryChart(theme) {
-                var ctx = document.getElementById('categoryChart').getContext('2d');
+        // Function to create the doughnut chart
+        function createCategoryChart(theme) {
+            var ctx = document.getElementById('categoryChart').getContext('2d');
 
-                if (categoryLabels.length === 0) {
-                    // Jeśli nie ma żadnych kategorii, tworzymy pusty wykres
-                    var emptyChart = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['No Data'],
-                            datasets: [{
-                                data: [1], // Dowolna wartość, aby zachować spójność
-                                backgroundColor: ['#eee'], // Kolor tła dla braku danych
-                                borderWidth: 0 // Bez obramowania
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    display: false // Ukryj legendę
-                                },
-                                tooltip: {
-                                    enabled: false // Wyłącz podpowiedzi
-                                }
+            if (categoryLabels.length === 0) {
+                // If no categories, create an empty chart
+                var emptyChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{
+                            data: [1], // Any value to keep consistency
+                            backgroundColor: ['#eee'], // Background color for no data
+                            borderWidth: 0 // No border
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false // Hide legend
+                            },
+                            tooltip: {
+                                enabled: false // Disable tooltips
                             }
                         }
-                    });
-
-                    return emptyChart;
-                } else {
-                    // Tworzenie wykresu z danymi kategorii
-                    var backgroundColor = [];
-                    var borderColor = [];
-
-                    for (var i = 0; i < categoryLabels.length; i++) {
-                        var colorIndex = i % colors.length;
-                        backgroundColor.push(colors[colorIndex]);
-                        borderColor.push('#fff'); // obramowanie każdego segmentu będzie białe
                     }
+                });
 
-                    var chart = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: categoryLabels,
-                            datasets: [{
-                                label: 'Category Expenses',
-                                backgroundColor: backgroundColor,
-                                borderColor: borderColor,
-                                borderWidth: 1,
-                                data: categoryAmounts
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    labels: {
-                                        color: theme === 'dark' ? '#fff' : '#000'
-                                    }
-                                },
-                                tooltip: {
-                                    backgroundColor: theme === 'dark' ? '#333' : '#fff',
-                                    titleColor: theme === 'dark' ? '#fff' : '#000',
-                                    bodyColor: theme === 'dark' ? '#fff' : '#000'
+                return emptyChart;
+            } else {
+                // Create chart with category data
+                var backgroundColor = [];
+                var borderColor = [];
+
+                for (var i = 0; i < categoryLabels.length; i++) {
+                    var colorIndex = i % colors.length;
+                    backgroundColor.push(colors[colorIndex]);
+                    borderColor.push('#fff'); // Border for each segment will be white
+                }
+
+                var chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categoryLabels,
+                        datasets: [{
+                            label: 'Category Expenses',
+                            backgroundColor: backgroundColor,
+                            borderColor: borderColor,
+                            borderWidth: 1,
+                            data: categoryAmounts
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: theme === 'dark' ? '#fff' : '#000'
                                 }
+                            },
+                            tooltip: {
+                                backgroundColor: theme === 'dark' ? '#333' : '#fff',
+                                titleColor: theme === 'dark' ? '#fff' : '#000',
+                                bodyColor: theme === 'dark' ? '#fff' : '#000'
                             }
                         }
-                    });
+                    }
+                });
 
-                    return chart;
-                }
+                return chart;
             }
+        }
 
-        // Inicjalizacja wykresów z domyślnym motywem
+        // Initialize charts with default theme
         var theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
         var myChart = createChart(theme);
         var categoryChart = createCategoryChart(theme);
 
-        // Obsługa przełączania motywów
+        // Handle theme switching
         document.querySelector('.theme-toggle-btn').addEventListener('click', function () {
-            // kod obsługi przełączania motywów
+            // code to handle theme switching
         });
     </script>
 }

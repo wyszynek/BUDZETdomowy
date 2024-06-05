@@ -1,87 +1,110 @@
-﻿<!DOCTYPE html>
+﻿@model HomeBudget.Models.Login
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Home Budget+</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
     <style>
         /* Stylizacja całej strony */
         body {
-            font-family: Arial, sans-serif; /* Ustawienie czcionki */
-            margin: 0; /* Usunięcie marginesu */
-            padding: 0; /* Usunięcie wypełnienia */
-            background-color: #f4f4f4; /* Kolor tła */
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
         }
 
         /* Stylizacja formularza logowania */
-        form {
-            margin: 0 auto; /* Wyśrodkowanie formularza na stronie */
-            max-width: 400px; /* Maksymalna szerokość formularza */
-            padding: 20px; /* Dodanie wypełnienia dla formularza */
-            background-color: #fff; /* Kolor tła formularza */
-            border-radius: 5px; /* Zaokrąglenie rogów */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Dodanie cienia */
+        .login-form {
+            width: 100%;
+            max-width: 400px; /* Ograniczenie szerokości formularza */
+            margin: 50px auto; /* Wyśrodkowanie formularza i dodanie marginesu od góry */
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
-        /* Stylizacja etykiet */
-        label {
-            font-size: 16px; /* Powiększenie czcionki */
-            display: block; /* Wyrównanie etykiet jeden pod drugim */
-            margin-bottom: 10px; /* Odstęp między etykietami */
-        }
-
-        /* Stylizacja pól tekstowych */
-        input[type="text"], input[type="password"] {
-            font-size: 16px; /* Powiększenie czcionki */
-            padding: 8px; /* Dodanie wypełnienia dla pól tekstowych */
-            width: 100%; /* Szerokość równa szerokości rodzica */
-            box-sizing: border-box; /* Włączenie box-sizing */
-            margin-bottom: 10px; /* Odstęp między polami */
-        }
-
-        /* Stylizacja przycisku */
-        button[type="submit"] {
-            font-size: 16px; /* Powiększenie czcionki */
-            padding: 10px 20px; /* Dodanie wypełnienia dla przycisku */
-            background-color: #007bff; /* Kolor tła przycisku */
-            color: #fff; /* Kolor tekstu */
-            border: none; /* Usunięcie obramowania */
-            cursor: pointer; /* Zmiana kursora na wskaźnik */
-            transition: background-color 0.3s ease; /* Animacja zmiany koloru tła */
-        }
-
-            button[type="submit"]:hover {
-                background-color: #0056b3; /* Kolor tła przycisku po najechaniu */
+            .login-form h2 {
+                margin-bottom: 30px;
+                color: #333;
             }
 
-        /* Stylizacja linku do rejestracji */
-        p a {
-            color: #007bff; /* Kolor linku */
+            .login-form input[type="text"],
+            .login-form input[type="password"] {
+                width: 100%;
+                padding: 15px;
+                margin: 10px 0;
+                border: none;
+                border-radius: 5px;
+                background-color: #f5f5f5;
+                box-sizing: border-box;
+                font-size: 16px;
+            }
+
+            .login-form button[type="submit"] {
+                width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 5px;
+                background-color: #007bff;
+                color: #fff;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+                .login-form button[type="submit"]:hover {
+                    background-color: #0056b3;
+                }
+
+            .login-form p {
+                margin-top: 20px;
+                color: #666;
+            }
+
+                .login-form p a {
+                    color: #007bff;
+                    text-decoration: none;
+                }
+
+                    .login-form p a:hover {
+                        text-decoration: underline;
+                    }
+
+        .fa-user,
+        .fa-lock {
+            color: #777;
+            margin-right: 10px;
         }
 
-        /* Wyśrodkowanie tytułu */
-        header h1, title {
+        /* Stylizacja nagłówka */
+        .text-center h1 {
+            font-family: 'Montserrat', sans-serif;
             text-align: center;
         }
     </style>
     <title>Home Budget - Login</title>
 </head>
 <body>
-    <header>
-        <h1>Home Budget</h1>
-    </header>
+    <div class="text-center">
+        <h1 class="display-1" style="margin-bottom: 50px;">Home Budget+</h1>
+    </div>
 
-    <form action="/login" method="post">
-        <h2 style="text-align: center; color: blue;">Login</h2>
+    <div class="login-form">
+        <h2><i class="fas fa-user"></i>Login</h2>
 
-        <label for="username" style="color: blue;">Username</label>
-        <input type="text" id="username" name="username">
+        <form action="/login" method="post">
+            <input type="text" id="username" name="username" placeholder="Username">
+            <input type="password" id="password" name="password" placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
 
-        <label for="password" style="color: blue;">Password</label>
-        <input type="password" id="password" name="password">
-
-        <button type="submit">Login</button>
-    </form>
-
-    <p style="text-align: center;">Or you can register by clicking <a href="/User/Create">here</a></p>
+        <p>Or you can register by clicking <a href="/User/Create">here</a></p>
+    </div>
 </body>
 </html>

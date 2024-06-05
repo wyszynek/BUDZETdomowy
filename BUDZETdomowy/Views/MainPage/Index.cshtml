@@ -1,11 +1,25 @@
 ﻿@model HomeBudget.Models.MainPageViewModel
 
-<h3 class="display-4">Financial Summary</h3>
-<div class="financial-summary">
-    <p>Total Income: <span>@ViewBag.TotalIncome</span></p>
-    <p>Total Expense: <span>@ViewBag.TotalExpense</span></p>
-    <p>Balance: <span>@ViewBag.Balance</span></p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<div class="row">
+    <div class="col-md-6">
+        <h3 class="display-4">Financial Summary</h3>
+        <div class="financial-summary special-background">
+            <p><i class="fas fa-money-bill-wave"></i>  Total Income: <span>@ViewBag.TotalIncome</span></p>
+        </div>
+        <div class="financial-summary special-background">
+            <p><i class="fas fa-shopping-cart"></i>  Total Expense: <span>@ViewBag.TotalExpense</span></p>
+        </div>
+        <div class="financial-summary special-background">
+            <p><i class="fas fa-balance-scale"></i>  Balance: <span>@ViewBag.Balance</span></p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div id='calendar' class="special-background" ></div>
+    </div>
 </div>
+
 
 <form method="post" asp-action="Index">
     <div>
@@ -16,20 +30,18 @@
     </div>
 </form>
 
-<h3 class="display-4">Income vs Expense</h3>
-<div class="chart-container">
-    <canvas id="myChart" width="400" height="200"></canvas>
-</div>
-
-<p></p>
-
-<h3 class="display-4">Category Expenses</h3>
-<div class="chart-container">
-    <canvas id="categoryChart" width="300" height="150"></canvas>
+<h3 class="display-4">Income vs Expense and Category Expenses</h3>
+<div class="chart-container d-flex justify-content-between special-background">
+    <div style="flex: 1; margin-right: 10px;">
+        <canvas id="myChart" width="400" height="200"></canvas>
+    </div>
+    <div style="flex: 0.5;">
+        <canvas id="categoryChart" width="200" height="200"></canvas>
+    </div>
 </div>
 
 <h3 class="display-4">Recent Transactions</h3>
-<table>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Date</th>
@@ -42,9 +54,9 @@
         @foreach (var transaction in ViewBag.RecentTransactions)
         {
             <tr>
-                <td>@transaction.Date.ToString("yyyy-MM-dd")</td>
-                <td>@transaction.Category.CategoryName</td>
-                <td>@transaction.Amount</td>
+                <td>@transaction.Date.ToString("yyyy-MM-dd h:mm")</td>
+                <td>@Html.Raw(transaction.Category.Icon) @transaction.Category.CategoryName</td>
+                <td>@string.Format("{0:0.00}", transaction.Amount)</td>
                 <td>@transaction.Note</td>
             </tr>
         }
@@ -52,6 +64,28 @@
 </table>
 
 @section Scripts {
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.13/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: '/Event/GetEvents',
+                dateClick: function (info) {
+                    //mozemy dodac poprzez klikniecie
+                }
+            });
+            calendar.render();
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#transactionsTable').DataTable();
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Data for the charts
@@ -228,7 +262,11 @@
 
         // Handle theme switching
         document.querySelector('.theme-toggle-btn').addEventListener('click', function () {
-            // code to handle theme switching
+            theme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+            myChart.destroy();
+            categoryChart.destroy();
+            myChart = createChart(theme);
+            categoryChart = createCategoryChart(theme);
         });
     </script>
 }

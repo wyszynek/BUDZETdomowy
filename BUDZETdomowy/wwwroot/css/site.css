@@ -199,3 +199,39 @@ body {
     margin: 0 auto;
     max-height: 800px;
 }
+
+/*specjalne tlo wykresow*/
+.special-background {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    color: #000; 
+    margin-bottom: 20px; 
+}
+
+.dark-theme .special-background {
+    background-color: #444; 
+    color: #fff; 
+}
+
+/*tabela w ciemnym motywie*/
+.dark-theme table.table-striped tbody tr:nth-child(odd) {
+    background-color: #333; 
+    color: #ddd; 
+}
+
+.dark-theme table.table-striped tbody tr:nth-child(even) {
+    background-color: #2f2f2f;
+    color: #ddd;
+}
+
+.dark-theme table.table-striped thead {
+    background-color: #444; 
+    color: #ddd; 
+}
+
+.financial-summary p {
+    font-size: 1.2em; /* Adjust font size as needed */
+    font-weight: bold; /* Make the text bold */
+    margin-bottom: 10px; /* Add some space below each paragraph */
+}

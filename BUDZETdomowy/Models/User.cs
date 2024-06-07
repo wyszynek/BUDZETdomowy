@@ -28,6 +28,8 @@ namespace HomeBudget.Models
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
+
+        public bool? IsAdmin { get; set; }
     }
 
     public class UserHelper

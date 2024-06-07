@@ -32,6 +32,13 @@ namespace HomeBudget.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminIndex()
+        {
+            var applicationDbContext = _context.Transactions.Include(t => t.Account).Include(t => t.Currency).Include(t => t.Category).Include(t => t.User);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
         public IActionResult ExportToCSV()
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);

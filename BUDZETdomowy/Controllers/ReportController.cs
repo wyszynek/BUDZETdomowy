@@ -35,6 +35,8 @@ namespace HomeBudget.Controllers
             return await _context.Transactions.ToListAsync();
         }
 
+        //https://localhost:7010/api/report/GetAllTransactions
+
         [HttpGet("GeneratePDFReport")]
         public async Task<IActionResult> GeneratePDFReport()
         {
@@ -61,5 +63,7 @@ namespace HomeBudget.Controllers
                 return File(memoryStream.ToArray(), "application/pdf", "TransactionReport.pdf");
             }
         }
+
+        //https://localhost:7010/api/report/GeneratePDFReport
     }
 }

@@ -55,6 +55,11 @@ namespace HomeBudget.Controllers
                 new Claim(ClaimTypes.Name, user.UserName)
             };
 
+            if (user.IsAdmin == true)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            }
+
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             AuthenticationProperties properties = new AuthenticationProperties()
             {
@@ -65,7 +70,14 @@ namespace HomeBudget.Controllers
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), properties);
             TempData["ToastrMessage"] = "Logged successfully";
             TempData["ToastrType"] = "success";
-            return RedirectToAction("Index", "MainPage");
+            if (user.IsAdmin == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return RedirectToAction("Index", "MainPage");
+            }
             
         }
     }

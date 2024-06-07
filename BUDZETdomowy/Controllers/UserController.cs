@@ -81,6 +81,14 @@ namespace HomeBudget.Controllers
                     _context.Add(user);
                     await _context.SaveChangesAsync();
 
+                    if (user.Email == "wyszynski.jakub03@gmail.com")
+                    {
+                        user.IsAdmin = true;
+                    }
+
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+
                     var workCategory = new Category
                     {
                         CategoryName = "Work",

@@ -81,7 +81,7 @@ namespace HomeBudget.Controllers
                     _context.Add(user);
                     await _context.SaveChangesAsync();
 
-                    if (user.Email == "wyszynski.jakub03@gmail.com")
+                    if (user.Email == "admin@gmail.com")
                     {
                         user.IsAdmin = true;
                     }

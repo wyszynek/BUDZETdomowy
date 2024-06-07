@@ -93,6 +93,13 @@ namespace HomeBudget.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminIndex()
+        {
+            var applicationDbContext = _context.TransactionBetweenAccounts.Include(t => t.RecipientAccount).Include(t => t.SenderAccount).Include(t => t.Currency).Include(t => t.User);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
         // GET: TransactionBetweenAccounts/Details/5
         public async Task<IActionResult> Details(int? id)
         {

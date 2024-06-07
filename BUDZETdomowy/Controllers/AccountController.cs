@@ -28,7 +28,12 @@ namespace HomeBudget.Controllers
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
             return View(await _context.Accounts.Include(a => a.Currency).Where(x => x.UserId == currentUserId).ToListAsync());
+        }
 
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminIndex()
+        {
+            return View(await _context.Accounts.Include(a => a.Currency).Include(x => x.User).ToListAsync());
         }
 
         // GET: Account/Details/5

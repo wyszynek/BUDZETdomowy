@@ -1,0 +1,85 @@
+﻿@model IEnumerable<HomeBudget.Models.TransactionBetweenAccounts>
+
+@{
+    ViewData["Title"] = "All transaction between accounts";
+}
+
+<!--ladujemy biblioteke stylizacji-->
+<link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<h1 class="display-4">All transaction beetwen accounts</h1>
+
+<table class="table" id="transactionsTable">
+    <thead>
+        <tr>
+            <th>
+                User Name
+            </th>
+            <th>
+                Sender
+            </th>
+            <th>
+                Recipient
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                Currency
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Note)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item.SenderAccount != null && item.RecipientAccount != null)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SenderAccount.AccountName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RecipientAccount.AccountName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Currency.Code)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Note)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<!--uzywamy jQuery aby poczekac na zaladowanie dokumentu i nastepnie wywolac funkcje datatable na identyfikatorze 'transactionsTable'-->
+@section Scripts {
+    <!--ladujemy biblioteke ktora dostarcza funkcji do interakcji z tabela-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#transactionsTable').DataTable();
+        });
+    </script>
+}

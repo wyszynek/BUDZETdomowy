@@ -22,7 +22,15 @@ namespace HomeBudget.Controllers
             ClaimsPrincipal claimUser = HttpContext.User;
             if (claimUser.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "MainPage");
+                var isAdmin = claimUser.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+                if (isAdmin)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "MainPage");
+                }
             }
 
             return View();

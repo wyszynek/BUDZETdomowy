@@ -9,7 +9,6 @@
     <title>Home Budget+</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
     <style>
-        /* Stylizacja całej strony */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -17,64 +16,71 @@
             background-color: #f0f0f0;
         }
 
-        /* Stylizacja formularza logowania */
         .login-form {
             width: 100%;
-            max-width: 400px; /* Ograniczenie szerokości formularza */
-            margin: 50px auto; /* Wyśrodkowanie formularza i dodanie marginesu od góry */
+            max-width: 400px;
+            margin: 50px auto;
             padding: 40px;
             background-color: #fff;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            transition: box-shadow 0.3s ease; /* Dodajemy płynne przejście poświaty */
         }
 
-            .login-form h2 {
-                margin-bottom: 30px;
-                color: #333;
+        .white-theme .login-form {
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5); /* Czarna poświata w jasnym motywie */
+        }
+
+        .dark-theme .login-form {
+            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5); /* Biała poświata w ciemnym motywie */
+        }
+
+        .login-form h2 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .login-form button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .login-form button[type="submit"]:hover {
+                background-color: #0056b3;
             }
 
-            .login-form input[type="text"],
-            .login-form input[type="password"] {
-                width: 100%;
-                padding: 15px;
-                margin: 10px 0;
-                border: none;
-                border-radius: 5px;
-                background-color: #f5f5f5;
-                box-sizing: border-box;
-                font-size: 16px;
+        .login-form p {
+            margin-top: 20px;
+            color: #666;
+        }
+
+            .login-form p a {
+                color: #007bff;
+                text-decoration: none;
             }
 
-            .login-form button[type="submit"] {
-                width: 100%;
-                padding: 15px;
-                border: none;
-                border-radius: 5px;
-                background-color: #007bff;
-                color: #fff;
-                font-size: 16px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-                .login-form button[type="submit"]:hover {
-                    background-color: #0056b3;
+                .login-form p a:hover {
+                    text-decoration: underline;
                 }
-
-            .login-form p {
-                margin-top: 20px;
-                color: #666;
-            }
-
-                .login-form p a {
-                    color: #007bff;
-                    text-decoration: none;
-                }
-
-                    .login-form p a:hover {
-                        text-decoration: underline;
-                    }
 
         .fa-user,
         .fa-lock {
@@ -82,29 +88,63 @@
             margin-right: 10px;
         }
 
-        /* Stylizacja nagłówka */
         .text-center h1 {
             font-family: 'Montserrat', sans-serif;
             text-align: center;
+            transition: text-shadow 0.3s ease; /* Dodajemy płynne przejście poświaty */
+        }
+
+        .white-theme .text-center h1 {
+            text-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5); /* Czarna poświata w jasnym motywie */
+        }
+
+        .dark-theme .text-center h1 {
+            text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5); /* Biała poświata w ciemnym motywie */
+        }
+
+        /* Stylowanie dla etykiety checkboxa */
+        .checkbox-label {
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .white-theme .checkbox-label {
+            color: #000;
+        }
+
+        .dark-theme .checkbox-label {
+            color: #fff;
         }
     </style>
     <title>Home Budget - Login</title>
 </head>
-<body>
+<body class="white-theme">
     <div class="text-center">
         <h1 class="display-1" style="margin-bottom: 50px;">Home Budget+</h1>
     </div>
 
     <div class="login-form">
-        <h2><i class="fas fa-user"></i>Login</h2>
+        <h2><i class="fas fa-user"></i> Login</h2>
 
-        <form action="/login" method="post">
-            <input type="text" id="username" name="username" placeholder="Username">
-            <input type="password" id="password" name="password" placeholder="Password">
+        <form asp-action="Index" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input asp-for="UserName" class="form-control" placeholder="Username" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+            <input asp-for="Password" class="form-control" placeholder="Password" type="password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+            <label class="checkbox-label" style="color:black">
+                <input type="checkbox" asp-for="KeepLoggedIn" />
+                Keep me logged in.
+            </label>
+            <p></p>
             <button type="submit">Login</button>
         </form>
 
-        <p>Or you can register by clicking <a href="/User/Create">here</a></p>
+        <p>Or you can register by clicking <a asp-controller="User" asp-action="Create">here</a></p>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 </body>
 </html>

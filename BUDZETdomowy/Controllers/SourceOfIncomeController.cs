@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HomeBudget.Data;
 using HomeBudget.Models;
 using HomeBudget.Models.Enum;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HomeBudget.Controllers
 {
@@ -25,6 +26,12 @@ namespace HomeBudget.Controllers
         {
             var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
             return View(await _context.SourceOfIncomes.Where(x => x.UserId == currentUserId).ToListAsync());
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminIndex()
+        {
+            return View(await _context.SourceOfIncomes.Include(x => x.User).ToListAsync());
         }
 
         // GET: SourceOfIncome/Details/5

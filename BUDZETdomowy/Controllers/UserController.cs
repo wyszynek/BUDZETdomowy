@@ -23,29 +23,29 @@ namespace HomeBudget.Controllers
         }
 
         // GET: User
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            var currentUserId = UserHelper.GetCurrentUserId(HttpContext);
-            return View(await _context.Users.Where(x => x.Id == currentUserId).ToListAsync());
+            return View(await _context.Users.ToListAsync());
         }
 
-        //// GET: User/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // GET: User/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var user = await _context.Users
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(user);
-        //}
+            return View(user);
+        }
 
         [AllowAnonymous]
         // GET: User/Create

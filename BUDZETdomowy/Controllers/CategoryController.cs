@@ -29,6 +29,12 @@ namespace HomeBudget.Controllers
             return View(await _context.Categories.Where(x => x.UserId == currentUserId).ToListAsync());
         }
 
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminIndex()
+        {
+            return View(await _context.Categories.Include(x => x.User).ToListAsync());
+        }
+
         // GET: Category/Details/5
         public async Task<IActionResult> Details(int? id)
         {

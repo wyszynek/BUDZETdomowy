@@ -9,6 +9,9 @@ using HomeBudget.Data;
 using HomeBudget.Models;
 using Microsoft.AspNetCore.Authorization;
 using Azure.Identity;
+using MimeKit.Text;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace HomeBudget.Controllers
 {
@@ -16,10 +19,12 @@ namespace HomeBudget.Controllers
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public UserController(ApplicationDbContext context)
+        public UserController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: User
@@ -99,6 +104,7 @@ namespace HomeBudget.Controllers
                     _context.Add(workCategory);
 
                     await _context.SaveChangesAsync();
+                    await SendWelcomeEmail(user.Email, user.FirstName);
 
                     TempData["ToastrMessage"] = "User has been created successfully";
                     TempData["ToastrType"] = "success";
@@ -107,6 +113,28 @@ namespace HomeBudget.Controllers
             }
 
             return View(user);
+        }
+
+        private async Task SendWelcomeEmail(string email, string firstName)
+        {
+            var smtpSettings = _configuration.GetSection("Smtp").Get<SmtpSettings>();
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(smtpSettings.SenderName, smtpSettings.SenderEmail));
+            message.To.Add(MailboxAddress.Parse(email));
+            message.Subject = "Welcome to Home Budget";
+            message.Body = new TextPart(TextFormat.Html)
+            {
+                Text = $"Hello {firstName},<br/><br/>Your account has been created successfully. Welcome to our system!<br/><br/>Best regards,<br/>Home Budget Team"
+            };
+
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync(smtpSettings.Server, smtpSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(smtpSettings.Username, smtpSettings.Password);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+            }
         }
 
 
@@ -198,5 +226,15 @@ namespace HomeBudget.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
+    }
+
+    public class SmtpSettings
+    {
+        public string Server { get; set; }
+        public int Port { get; set; }
+        public string SenderName { get; set; }
+        public string SenderEmail { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
 }

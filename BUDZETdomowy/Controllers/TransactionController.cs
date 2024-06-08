@@ -50,13 +50,13 @@ namespace HomeBudget.Controllers
                 .ToList();
 
             var builder = new StringBuilder();
-            builder.AppendLine("Category, Account, Amount, Date");
+            builder.AppendLine("Category; Account; Amount; Date");
 
             foreach (var transaction in transactions)
             {
                 string categoryName = transaction.Category?.CategoryName ?? "Unknown";
                 string accountName = transaction.Account?.AccountName ?? "Unknown";
-                builder.AppendLine($"{categoryName}, {accountName}, {transaction.Amount}, {transaction.Currency.Code}, {transaction.Date}");
+                builder.AppendLine($"{categoryName}; {accountName}; {transaction.Amount}; {transaction.Currency.Code}; {transaction.Date}");
             }
 
             return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "transactions.csv");

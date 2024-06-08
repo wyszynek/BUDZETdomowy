@@ -34,12 +34,12 @@ namespace HomeBudget.Controllers
                 .ToList();
 
             var builder = new StringBuilder();
-            builder.AppendLine("Sender, Recipient, Amount, Date");
+            builder.AppendLine("Sender; Recipient; Amount; Date");
             foreach (var TBA in transactionBetweenAccounts)
             {
                 string senderName = TBA.SenderAccount?.AccountName ?? "Unknown";
                 string recipientName = TBA.RecipientAccount?.AccountName ?? "Unknown";
-                builder.AppendLine($"{senderName}, {recipientName}, {TBA.Amount}, {TBA.Currency.Code}, {TBA.Date}");
+                builder.AppendLine($"{senderName}; {recipientName}; {TBA.Amount}; {TBA.Currency.Code}; {TBA.Date}");
             }
 
             return File(Encoding.UTF8.GetBytes(builder.ToString()), "text/csv", "TransactionBetweenAccounts.csv");

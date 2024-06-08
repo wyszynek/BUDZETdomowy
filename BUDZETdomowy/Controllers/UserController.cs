@@ -123,10 +123,30 @@ namespace HomeBudget.Controllers
             message.From.Add(new MailboxAddress(smtpSettings.SenderName, smtpSettings.SenderEmail));
             message.To.Add(MailboxAddress.Parse(email));
             message.Subject = "Welcome to Home Budget";
-            message.Body = new TextPart(TextFormat.Html)
+
+            // Body text
+            var body = new TextPart("html")
             {
                 Text = $"Hello {firstName},<br/><br/>Your account has been created successfully. Welcome to our system!<br/><br/>Best regards,<br/>Home Budget Team"
             };
+
+            // Load the image and create an attachment
+            var attachment = new MimePart("image", "jpeg")
+            {
+                Content = new MimeContent(System.IO.File.OpenRead("wwwroot/images/HOMEBUDGET.jpg")),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = "welcome.jpg"
+            };
+
+            // Create a multipart/mixed container to hold the message text and the attachment
+            var multipart = new Multipart("mixed")
+            {
+                body,
+                attachment
+            };
+
+            message.Body = multipart;
 
             using (var client = new SmtpClient())
             {

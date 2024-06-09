@@ -12,12 +12,12 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 20px">
                 <label asp-for="BudgetName" class="control-label">Name</label>
-                <input asp-for="BudgetName" class="form-control" />
+                <input asp-for="BudgetName" class="form-control" placeholder="Enter budget name" />
                 <span asp-validation-for="BudgetName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 20px">
                 <label asp-for="CategoryId" class="control-label">Category</label>
                 <select asp-for="CategoryId" class="form-control">
                     @foreach (var category in ViewBag.Categories)
@@ -35,7 +35,7 @@
                 </select>
                 <span asp-validation-for="Id" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group" >
                 <label asp-for="AccountId" class="control-label">Account</label>
                 <select asp-for="AccountId" class="form-control">
                     @foreach (var account in ViewBag.Accounts)
@@ -53,23 +53,23 @@
                 </select>
                 <span asp-validation-for="Id" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 20px">
                 <label asp-for="Limit" class="control-label"></label>
                 <input asp-for="Limit" class="form-control" type="number" step="0.01" />
                 <span asp-validation-for="Limit" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 20px">
                 <label asp-for="CreationTime" class="control-label">Start Date</label>
                 <input asp-for="CreationTime" class="form-control" asp-format="yyyy-MM-ddTHH:mm" />
                 <span asp-validation-for="CreationTime" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 45px">
                 <label asp-for="EndTime" class="control-label">End Date</label>
                 <input asp-for="EndTime" class="form-control" asp-format="yyyy-MM-ddTHH:mm" />
                 <span asp-validation-for="EndTime" class="text-danger"></span>
             </div>
             <p></p>
-            <div class="form-group">
+            <div class="form-group" >
                 <input type="submit" value="Create" class="btn btn-primary" style="margin-right: 10px; background-color: #28a745;" /> |
                 <a asp-action="Index" class="btn btn-secondary" style="margin-left: 10px;">Back to List</a>
             </div>

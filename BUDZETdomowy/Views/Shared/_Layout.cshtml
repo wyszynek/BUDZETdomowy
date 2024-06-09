@@ -15,6 +15,8 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
     <link rel="icon" type="image/x-icon" href="~/favicon1.ico" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-j7epO/FFl//egs56vzSDJmZFet5tnrwiIvv98JUBz1p/6e1sOBr1Hd1fJGpzBk29fTpF9ZvMmmJnXnJlr9K/WA==" crossorigin="anonymous" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Asap&display=swap" rel="stylesheet">
 </head>
 
 <!--w tym body dajemy dostep korzystania z theme-->
@@ -22,13 +24,39 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div id="mySidenav" class="sidenav">
+                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <a class="nav-link text-white" asp-area="" asp-controller="MainPage" asp-action="Index">Financial Summary</a>
+                        }
+                        <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Index">Accounts</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Category" asp-action="Index">Categories</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Budget" asp-action="Index">Budgets</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="SourceOfIncome" asp-action="Index">Sources of income</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Transaction" asp-action="Index">Transactions</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="TransactionBetweenAccounts" asp-action="Index">Transaction between accounts</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Notepad" asp-action="Index">Notepad</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Receipt2" asp-action="Index">Receipts</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Event" asp-action="Index">Events</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="ReccuringPayment" asp-action="Index">Reccuring payments</a>
+                    </div>
+                }
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span style="font-size:30px; cursor:pointer; color: black; margin-right: 10px" onclick="openNav()">&#9776;</span>
+                }
+
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Home Budget</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="font-family: 'Lobster', sans-serif;">HOME BUDGET+</a>
                 }
                 else
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="MainPage" asp-action="Index">Home Budget</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="MainPage" asp-action="Index" style="font-family: 'Lobster', sans-serif;">HOME BUDGET+</a>
                 }
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -46,17 +74,17 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li>
-                                <a class="nav-link">Hello @User.FindFirst(ClaimTypes.Name)?.Value</a> <!-- Display the user's name -->
+                            <li class="nav-item" style="margin-right: 10px">
+                                <a class="nav-link text-primary" style="font-family: 'Asap'">Hello @User.FindFirst(ClaimTypes.Name)?.Value</a> <!-- Display the user's name -->
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="LogOut">Log out</a>
+                            <li class="nav-item" style="margin-right: 10px">
+                                <a class="nav-link text-light bg-danger rounded px-3 font-weight-bold" asp-area="" asp-controller="Home" asp-action="LogOut">Log out</a>
                             </li>
                         }
                     </ul>
 
                     <form method="post" asp-controller="Theme" asp-action="SetTheme" class="d-inline">
-                        <select name="theme" class="form-select" onchange="this.form.submit()">
+                        <select name="theme" class="form-select1" onchange="this.form.submit()">
                             <option>Change theme</option>
                             <option value="white-theme">Light Theme</option>
                             <option value="dark-theme">Dark Theme</option>
@@ -66,32 +94,6 @@ dostep do kontekstu biezacego zadania HTTP, a HttpContextAccessor to tam dajemy 
             </div>
         </nav>
     </header>
-
-    @if (User.Identity.IsAuthenticated)
-    {
-        <div id="mySidenav" class="sidenav">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-            {
-                <a class="nav-link text-white" asp-area="" asp-controller="MainPage" asp-action="Index">Financial Summary</a>
-            }
-            <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Index">Accounts</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="Category" asp-action="Index">Categories</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="Budget" asp-action="Index">Budgets</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="SourceOfIncome" asp-action="Index">Sources of income</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="Transaction" asp-action="Index">Transactions</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="TransactionBetweenAccounts" asp-action="Index">Transaction between accounts</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="Notepad" asp-action="Index">Notepad</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="Receipt2" asp-action="Index">Receipts</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="Event" asp-action="Index">Events</a>
-            <a class="nav-link text-white" asp-area="" asp-controller="ReccuringPayment" asp-action="Index">Reccuring payments</a>
-        </div>
-    }
-
-    @if (User.Identity.IsAuthenticated)
-    {
-        <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
-    }
 
     <div class="container">
         <main role="main" class="pb-3">

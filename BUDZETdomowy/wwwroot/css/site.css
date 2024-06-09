@@ -35,39 +35,39 @@ body {
     background: linear-gradient(to upper, #444 0%, #222 100%);
 }
 
-/* Stylowanie paginacji DataTable dla ciemnego motywu */
-.dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button {
-    color: #fff;
-    background-color: #666;
-}
+    /* Stylowanie paginacji DataTable dla ciemnego motywu */
+    .dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #fff;
+        background-color: #666;
+    }
 
-/* Aktualnie zaznaczona strona w paginacji */
-.dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-    color: #000 !important;
-    background-color: #fff !important;
-}
+        /* Aktualnie zaznaczona strona w paginacji */
+        .dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dark-theme .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            color: #000 !important;
+            background-color: #fff !important;
+        }
 
-/*styl wszystkich info*/
-.dark-theme .dataTables_wrapper .dataTables_length label,
-.dark-theme .dataTables_wrapper .dataTables_filter label,
-.dark-theme .dataTables_wrapper .dataTables_info {
-    color: #fff;
-}
+    /*styl wszystkich info*/
+    .dark-theme .dataTables_wrapper .dataTables_length label,
+    .dark-theme .dataTables_wrapper .dataTables_filter label,
+    .dark-theme .dataTables_wrapper .dataTables_info {
+        color: #fff;
+    }
 
-.dark-theme .dataTables_wrapper .dataTables_length select,
-.dark-theme .dataTables_wrapper .dataTables_filter input {
-    color: #fff; 
-    background-color: #666;
-    border: 1px solid #fff;
-}
+    .dark-theme .dataTables_wrapper .dataTables_length select,
+    .dark-theme .dataTables_wrapper .dataTables_filter input {
+        color: #fff;
+        background-color: #666;
+        border: 1px solid #fff;
+    }
 
-/*opcje select i input*/
-.dark-theme .dataTables_wrapper .dataTables_length select option,
-.dark-theme .dataTables_wrapper .dataTables_filter input {
-    color: #000;
-    background-color: #fff;
-}
+        /*opcje select i input*/
+        .dark-theme .dataTables_wrapper .dataTables_length select option,
+        .dark-theme .dataTables_wrapper .dataTables_filter input {
+            color: #000;
+            background-color: #fff;
+        }
 
 /*wiersze tabeli*/
 .dark-theme table.dataTable tbody tr {
@@ -152,17 +152,17 @@ body {
     transition: width 0.5s;
 }
 
-.progress-bar.high {
-    background-color: #ff4d4d;
-}
+    .progress-bar.high {
+        background-color: #ff4d4d;
+    }
 
-.progress-bar.medium {
-    background-color: #ffcc00;
-}
+    .progress-bar.medium {
+        background-color: #ffcc00;
+    }
 
-.progress-bar.low {
-    background-color: #4caf50;
-}
+    .progress-bar.low {
+        background-color: #4caf50;
+    }
 
 .custom-card {
     padding: 20px;
@@ -171,15 +171,18 @@ body {
     border: 2px solid; /* Dodajemy obwódkê */
     transition: border-color 0.3s; /* Dodajemy p³ynne przejœcie koloru */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
 }
 
-    .custom-card.dark-theme {
-        border-color: #222; /* Kolor obwódki dla motywu ciemnego */
-    }
+.dark-theme .custom-card {
+    background-color: #222;
+    border-color: #444; /* Kolor obwódki dla motywu ciemnego */
+}
 
-    .custom-card.white-theme {
-        border-color: #fff; /* Kolor obwódki dla motywu jasnego */
-    }
+.white-theme .custom-card {
+    background-color: #fff;
+    border-color: #ddd; /* Kolor obwódki dla motywu jasnego */
+}
 
 .custom-card-title {
     font-size: 1.8rem;
@@ -205,19 +208,19 @@ body {
     background-color: #f9f9f9;
     border-radius: 8px;
     padding: 20px;
-    color: #000; 
-    margin-bottom: 20px; 
+    color: #000;
+    margin-bottom: 20px;
 }
 
 .dark-theme .special-background {
-    background-color: #444; 
-    color: #fff; 
+    background-color: #444;
+    color: #fff;
 }
 
 /*tabela w ciemnym motywie*/
 .dark-theme table.table-striped tbody tr:nth-child(odd) {
-    background-color: #333; 
-    color: #ddd; 
+    background-color: #333;
+    color: #ddd;
 }
 
 .dark-theme table.table-striped tbody tr:nth-child(even) {
@@ -226,14 +229,14 @@ body {
 }
 
 .dark-theme table.table-striped thead {
-    background-color: #444; 
-    color: #ddd; 
+    background-color: #444;
+    color: #ddd;
 }
 
 .financial-summary p {
-    font-size: 1.2em; /* Adjust font size as needed */
-    font-weight: bold; /* Make the text bold */
-    margin-bottom: 10px; /* Add some space below each paragraph */
+    font-size: 1.2em; 
+    font-weight: bold; 
+    margin-bottom: 10px; 
 }
 
 .text-center h1 {
@@ -274,3 +277,35 @@ body {
         font-size: 36px;
         margin-left: 50px;
     }
+
+
+.white-theme .form-control, .white-theme .form-select {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ced4da;
+}
+
+.dark-theme .form-control, .dark-theme .form-select {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #666;
+}
+
+.form-select1 {
+    width: 140px;
+    height: 40px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #000;
+}
+
+.form-select1:hover {
+    opacity: 0.85;
+}
+
+.form-select1 option {
+    background-color: #fff;
+    color: #000;
+}
+

@@ -30,13 +30,17 @@ namespace HomeBudget.Models
         {
             try
             {
+                //żądanie GET do API NBP, aby pobrać kursy walut w formacie JSON.
                 var response = await _httpClient.GetAsync($"http://api.nbp.pl/api/exchangerates/tables/a/?format=json");
                 if (!response.IsSuccessStatusCode)
                 {
                     return null;
                 }
 
+                //Odczytuje zawartość odpowiedzi jako string
                 var content = await response.Content.ReadAsStringAsync();
+
+                //uzywamy JsonConvert z biblioteki Newtonsoft.Json do deserializacji JSON do kolekcji obiektów CurrencyRateResponse.
                 var currencyData = JsonConvert.DeserializeObject<IEnumerable<CurrencyRateResponse>>(content);
 
                 return currencyData.First().CurrencyRates;

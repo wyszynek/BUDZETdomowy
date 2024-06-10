@@ -66,7 +66,8 @@ namespace HomeBudget.Controllers
                 {
                     var imageFile = Request.Form.Files[0]; // Pierwszy przesłany plik
 
-                    // Jeśli użytkownik przesłał plik, obsłuż jego przesłanie
+                    // Jeśli plik został przesłany, pobiera pierwszy plik z formularza (Request.Form.Files[0]).
+                    // Przesyła później dane pliku do pamięci (MemoryStream) i zapisuje je w właściwościach receipt2.Data oraz receipt2.ContentType.
                     using (var memoryStream = new MemoryStream())
                     {
                         await imageFile.CopyToAsync(memoryStream);

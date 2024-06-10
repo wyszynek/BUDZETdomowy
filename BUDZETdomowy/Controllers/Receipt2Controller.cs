@@ -103,6 +103,7 @@ namespace HomeBudget.Controllers
         }
 
         // GET: Receipt2/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -123,7 +124,7 @@ namespace HomeBudget.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ContentType,Data")] Receipt2 receipt2)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Receipt2 receipt2, IFormFile newImage)
         {
             receipt2.UserId = UserHelper.GetCurrentUserId(HttpContext);
             await TryUpdateModelAsync(receipt2);
@@ -137,6 +138,27 @@ namespace HomeBudget.Controllers
             {
                 try
                 {
+                    // Sprawdź, czy użytkownik przesłał nowy plik obrazu
+                    if (newImage != null && newImage.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await newImage.CopyToAsync(memoryStream);
+                            receipt2.Data = memoryStream.ToArray();
+                            receipt2.ContentType = newImage.ContentType;
+                        }
+                    }
+                    else
+                    {
+                        // Zachowaj istniejące dane obrazu, jeśli nowy plik nie został przesłany
+                        var existingReceipt = await _context.Receipts2.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id);
+                        if (existingReceipt != null)
+                        {
+                            receipt2.Data = existingReceipt.Data;
+                            receipt2.ContentType = existingReceipt.ContentType;
+                        }
+                    }
+
                     _context.Update(receipt2);
                     await _context.SaveChangesAsync();
                 }

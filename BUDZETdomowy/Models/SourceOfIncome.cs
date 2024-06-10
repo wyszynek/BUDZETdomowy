@@ -17,7 +17,7 @@ namespace HomeBudget.Models
 
         public SalaryType SalaryType { get; set; }
 
-        [Required]
+        [Range(0.01, 100.00, ErrorMessage = "VAT should be greater than 0 and less than 100.")]
         [Column(TypeName = "decimal(18, 2)")]
         [DisplayFormat(DataFormatString = "{0:F2}")]
         public decimal VAT { get; set; }

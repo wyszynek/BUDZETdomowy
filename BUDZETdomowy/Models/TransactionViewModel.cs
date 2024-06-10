@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using HomeBudget.Models;
 
 namespace HomeBudget.Models
@@ -11,7 +12,9 @@ namespace HomeBudget.Models
         public int? SourceOfIncomeId { get; set; }
         public SourceOfIncome? SourceOfIncome { get; set; }
 
-        [Required(ErrorMessage = "Amount is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount should be greater than 0.")]
+        [Column(TypeName = "decimal(18, 2)")]
+        [DisplayFormat(DataFormatString = "{0:F2}")]
         public decimal Amount { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]

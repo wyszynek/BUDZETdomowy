@@ -14,7 +14,7 @@ namespace HomeBudget.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Please enter the name of the payment")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Category should be between 2 and 50 characters")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Category should be between 2 and 50 characters")]
         public string Title { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Please select a category.")]

@@ -8,7 +8,7 @@ namespace HomeBudget.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Title should be between 2 and 30 characters")]
+        [StringLength(30, MinimumLength = 2, ErrorMessage = "Title should be between 2 and 30 characters")]
         public string Title { get; set; }
 
         [Required]

@@ -9,7 +9,7 @@ namespace HomeBudget.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Please enter name of the account")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Name should be between 2 and 20 characters")]
+        [StringLength(20, MinimumLength = 2, ErrorMessage = "Name should be between 2 and 20 characters")]
         public string AccountName { get; set; }
 
         [Column(TypeName = "nvarchar(75)")]
